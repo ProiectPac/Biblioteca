@@ -14,7 +14,7 @@ LoginDialog::LoginDialog()
     QPushButton *loginButton = new QPushButton("Login", this);
     QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::accept);
     QPushButton *registerButton = new QPushButton("Register", this);
-    QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::reject);
+    QObject::connect(registerButton,&QPushButton::clicked,this,&LoginDialog::reject);
 
     QLabel *nameLabel = new QLabel(tr("Name:"));
     nameLabel->setBuddy(nameLineEdit);
@@ -33,9 +33,9 @@ LoginDialog::LoginDialog()
     setLayout(gridLayout);
 }
 
-User LoginDialog::getUserCredentials()
+QPair<QString, unsigned int> LoginDialog::getUserCredentials()
 {
-    return User(nameLineEdit->text(),FNVHash(passwordLineEdit->text()));
+    return QPair<QString, unsigned int>(nameLineEdit->text(),FNVHash(passwordLineEdit->text()));
 }
 
 unsigned int LoginDialog::FNVHash(QString str)

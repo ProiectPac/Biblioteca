@@ -15,7 +15,7 @@ class LoginDialog : public QDialog
 {
 public:
     LoginDialog();
-    User getUserCredentials();
+    QPair<QString, unsigned int> getUserCredentials();
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;
