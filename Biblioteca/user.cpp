@@ -5,6 +5,11 @@ const QString &User::getUserName() const
     return userName;
 }
 
+const unsigned int User::getPasswordHash()
+{
+    return passwordHash;
+}
+
 void User::setUserName(const QString &newUserName)
 {
     userName = newUserName;

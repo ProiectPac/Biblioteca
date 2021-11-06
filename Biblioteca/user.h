@@ -17,6 +17,7 @@ public:
     User(QString userName, unsigned int passwordHash);
 
     const QString &getUserName() const;
+    const unsigned int getPasswordHash();
     void setUserName(const QString &newUserName);
     void setPasswordHash(unsigned int newPasswordHash);
     const QVector<Book> &getBorrowedBooks() const;

@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     book.cpp \
+    database.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     book.h \
+    database.h \
     logindialog.h \
     mainwindow.h \
     user.h
