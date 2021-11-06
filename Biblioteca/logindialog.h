@@ -1,6 +1,8 @@
 #ifndef LOGINDIALOG_H
 #define LOGINDIALOG_H
 
+#include "user.h"
+
 #include <QDialog>
 #include <QLineEdit>
 #include <QPushButton>
@@ -13,7 +15,7 @@ class LoginDialog : public QDialog
 {
 public:
     LoginDialog();
-    QPair<QString,QString> getUserCredentials();
+    User getUserCredentials();
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;

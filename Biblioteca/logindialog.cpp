@@ -33,9 +33,7 @@ LoginDialog::LoginDialog()
     setLayout(gridLayout);
 }
 
-QPair<QString, QString> LoginDialog::getUserCredentials()
+User LoginDialog::getUserCredentials()
 {
-    QString userName = nameLineEdit->text();
-    QString userPassword = passwordLineEdit->text();
-    return QPair<QString,QString>(userName,userPassword);
+    return User(nameLineEdit->text(),passwordLineEdit->text());
 }

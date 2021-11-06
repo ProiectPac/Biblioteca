@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     logindialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    user.cpp
 
 HEADERS += \
     logindialog.h \
-    mainwindow.h
+    mainwindow.h \
+    user.h
 
 FORMS += \
     mainwindow.ui
