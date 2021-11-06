@@ -8,13 +8,13 @@ LoginDialog::LoginDialog()
     this->resize(200,200);
     this->setWindowTitle("Login");
 
-
-
-    QLineEdit *nameLineEdit = new QLineEdit(this);
-    QLineEdit *passwordLineEdit = new QLineEdit(this);
+    nameLineEdit = new QLineEdit(this);
+    passwordLineEdit = new QLineEdit(this);
 
     QPushButton *loginButton = new QPushButton("Login", this);
+    QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::accept);
     QPushButton *registerButton = new QPushButton("Register", this);
+    QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::reject);
 
     QLabel *nameLabel = new QLabel(tr("Name:"));
     nameLabel->setBuddy(nameLineEdit);
@@ -31,4 +31,11 @@ LoginDialog::LoginDialog()
     gridLayout->addWidget(loginButton, 2, 0);
     gridLayout->addWidget(registerButton, 2, 1);
     setLayout(gridLayout);
+}
+
+QPair<QString, QString> LoginDialog::getUserCredentials()
+{
+    QString userName = nameLineEdit->text();
+    QString userPassword = passwordLineEdit->text();
+    return QPair<QString,QString>(userName,userPassword);
 }
