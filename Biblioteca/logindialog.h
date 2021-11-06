@@ -19,6 +19,7 @@ public:
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;
+    unsigned int FNVHash(QString str);
 };
 
 #endif // LOGINDIALOG_H

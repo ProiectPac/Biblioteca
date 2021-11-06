@@ -9,10 +9,11 @@ class User
 {
 private:
     QString userName;
-    QString passwordHash;
+    unsigned int passwordHash;
 public:
     User();
-    User(QString userName, QString passwordHash);
+    User(QString userName, unsigned int passwordHash);
+
 };
 
 #endif // USER_H

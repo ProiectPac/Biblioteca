@@ -35,5 +35,20 @@ LoginDialog::LoginDialog()
 
 User LoginDialog::getUserCredentials()
 {
-    return User(nameLineEdit->text(),passwordLineEdit->text());
+    return User(nameLineEdit->text(),FNVHash(passwordLineEdit->text()));
+}
+
+unsigned int LoginDialog::FNVHash(QString str)
+{
+    const unsigned int fnv_prime = 0x811C9DC5;
+    unsigned int hash = 0;
+    unsigned int i = 0;
+    unsigned int len = str.length();
+
+    for (i = 0; i < len; i++)
+    {
+        hash *= fnv_prime;
+        hash ^= (str.toStdString()[i]);
+    }
+    return hash;
 }
