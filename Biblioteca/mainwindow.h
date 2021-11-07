@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include "user.h"
 #include "database.h"
+#include "logindialog.h"
+#include <QErrorMessage>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -23,5 +25,6 @@ private:
     DataBase database;
     void addBorrowBook(Book book);
     void deleteBorrowBook(Book book);
+    void logOut();
 };
 #endif // MAINWINDOW_H
