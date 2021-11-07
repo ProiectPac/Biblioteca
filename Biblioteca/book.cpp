@@ -20,6 +20,11 @@ int Book::getRemaingDays() const
     return remaingDays;
 }
 
+void Book::setRemaingDays(int newRemaingDays)
+{
+    remaingDays = newRemaingDays;
+}
+
 Book::Book()
 {
     name="";

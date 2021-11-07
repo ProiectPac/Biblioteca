@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
 
     if(loginDialog.getAction()==LoginDialog::Actions::Login)
     {
-        auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
-        if(foundUser.getUserName()!="")
+        if(dataBase.existsUser(userCredentials.first,userCredentials.second))
         {
-            MainWindow w;
+            auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
+            MainWindow w(foundUser,dataBase);
             w.show();
             return a.exec();
         }
@@ -32,8 +32,9 @@ int main(int argc, char *argv[])
     }
     else if(loginDialog.getAction()==LoginDialog::Actions::Register)
     {
-        dataBase.addUser(User(userCredentials.first, userCredentials.second));
-        MainWindow w;
+        User user = User(userCredentials.first, userCredentials.second);
+        dataBase.addUser(user);
+        MainWindow w(user,dataBase);
         w.show();
         return a.exec();
     }

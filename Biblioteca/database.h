@@ -15,14 +15,14 @@ private:
     QVector<Book> availableBooks;
 public:
     DataBase();
-    User findUser(QString userName, unsigned int passwordHash);
+    User& findUser(QString userName, unsigned int passwordHash);
     void addUser(User user);
     void removeUser(User user);
     QVector<Book> getAvailableBooks();
     void addAvailableBook(Book book);
     void removeBook(Book book);
     ~DataBase();
-
+    bool existsUser(QString userName, unsigned int passwordHash);
 };
 
 #endif // DATABASE_H
