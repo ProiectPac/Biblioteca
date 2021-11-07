@@ -5,6 +5,8 @@
 
 LoginDialog::LoginDialog()
 {
+    action = LoginDialog::Actions::Nothing;
+
     this->resize(200,200);
     this->setWindowTitle("Login");
 
@@ -12,9 +14,9 @@ LoginDialog::LoginDialog()
     passwordLineEdit = new QLineEdit(this);
 
     QPushButton *loginButton = new QPushButton("Login", this);
-    QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::accept);
+    QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::loginOnClick);
     QPushButton *registerButton = new QPushButton("Register", this);
-    QObject::connect(registerButton,&QPushButton::clicked,this,&LoginDialog::reject);
+    QObject::connect(registerButton,&QPushButton::clicked,this,&LoginDialog::registerOnClick);
 
     QLabel *nameLabel = new QLabel(tr("Name:"));
     nameLabel->setBuddy(nameLineEdit);
@@ -38,6 +40,11 @@ QPair<QString, unsigned int> LoginDialog::getUserCredentials()
     return QPair<QString, unsigned int>(nameLineEdit->text(),FNVHash(passwordLineEdit->text()));
 }
 
+LoginDialog::Actions LoginDialog::getAction() const
+{
+    return action;
+}
+
 unsigned int LoginDialog::FNVHash(QString str)
 {
     const unsigned int fnv_prime = 0x811C9DC5;
@@ -51,4 +58,16 @@ unsigned int LoginDialog::FNVHash(QString str)
         hash ^= (str.toStdString()[i]);
     }
     return hash;
+}
+
+void LoginDialog::loginOnClick()
+{
+    action=LoginDialog::Actions::Login;
+    QDialog::accept();
+}
+
+void LoginDialog::registerOnClick()
+{
+    action=LoginDialog::Actions::Register;
+    QDialog::reject();
 }
