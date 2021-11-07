@@ -27,7 +27,10 @@ DataBase::DataBase()
             std::getline(fin,author);
             std::string ISBN;
             std::getline(fin,ISBN);
-            newUser.addBorrowedBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN)));
+            int remainingDays;
+            fin>>remainingDays;
+            fin.get();
+            newUser.addBorrowedBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),remainingDays));
         }
         addUser(newUser);
     }
@@ -42,7 +45,7 @@ DataBase::DataBase()
         std::getline(fin,author);
         std::string ISBN;
         std::getline(fin,ISBN);
-        addAvailableBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN)));
+        addAvailableBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),-1));
     }
 }
 
@@ -95,7 +98,7 @@ DataBase::~DataBase()
         fout<<user.getBorrowedBooks().size()<<'\n';
         for(auto& book : user.getBorrowedBooks())
         {
-            fout<<book.getName().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString()<<'\n';
+            fout<<book.getName().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString() << '\n' << book.getRemaingDays() <<'\n';
         }
 
     }

@@ -15,6 +15,11 @@ const QString &Book::getName() const
     return name;
 }
 
+int Book::getRemaingDays() const
+{
+    return remaingDays;
+}
+
 Book::Book()
 {
     name="";
@@ -22,10 +27,11 @@ Book::Book()
     ISBN="";
 }
 
-Book::Book(QString name,QString author,QString ISBN)
+Book::Book(QString name,QString author,QString ISBN,int remaingDays)
 {
     this->name=name;
     this->author=author;
     this->ISBN=ISBN;
+    this->remaingDays = remaingDays;
 }
 
