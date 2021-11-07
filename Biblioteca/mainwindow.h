@@ -22,7 +22,7 @@ public:
 private:
     Ui::MainWindow *ui;
     User user;
-    DataBase database;
+    DataBase dataBase;
     void addBorrowBook(Book book);
     void deleteBorrowBook(Book book);
     void logOut();

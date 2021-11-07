@@ -7,14 +7,16 @@ MainWindow::MainWindow(User& user, DataBase& database,QWidget *parent)
 {
     ui->setupUi(this);
     this->user=user;
-    this->database=database;
-    QMenuBar* userBar = new QMenuBar();
+    this->dataBase=database;
+    QMenuBar* userBar = new QMenuBar(this);
     QMenu* logOut = new QMenu();
+    logOut->setTitle("User");
     QAction* logOutAction = new QAction();
-    logOutAction->setStatusTip("log out");
+    logOutAction->setText("Log out");
     connect(logOutAction,&QAction::triggered,this,&MainWindow::logOut);
     logOut->addAction(logOutAction);
     userBar->addMenu(logOut);
+    this->setMenuBar(userBar);
 }
 
 MainWindow::~MainWindow()
@@ -24,7 +26,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addBorrowBook(Book book)
 {
-    database.removeBook(book);
+    dataBase.removeBook(book);
     book.setRemaingDays(14);
     user.addBorrowedBook(book);
 }
@@ -33,7 +35,7 @@ void MainWindow::deleteBorrowBook(Book book)
 {
     user.removeBorrowedBook(book);
     book.setRemaingDays(-1);
-    database.addAvailableBook(book);
+    dataBase.addAvailableBook(book);
 }
 
 void MainWindow::logOut()
@@ -41,7 +43,7 @@ void MainWindow::logOut()
 
     LoginDialog loginDialog;
     loginDialog.exec();
-    DataBase dataBase;
+
     auto userCredentials = loginDialog.getUserCredentials();
 
     if(loginDialog.getAction()==LoginDialog::Actions::Login)
@@ -55,9 +57,10 @@ void MainWindow::logOut()
         }
         else
         {
+            this->close();
             QString message= "UserName/password combination is not correct.";
             QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-            errorMessage->showMessage(message);
+            errorMessage->showMessage(message);            
         }
     }
     else if(loginDialog.getAction()==LoginDialog::Actions::Register)
