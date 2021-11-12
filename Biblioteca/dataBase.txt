@@ -1,4 +1,4 @@
-4
+6
 dani 317557796
 2
 Amintiri din copilarie
@@ -18,6 +18,10 @@ Indoaie
 gigi 1042775456
 0
 fdssaf 1294896195
+0
+asta 0
+0
+asta 4005704355
 0
 2
 abba

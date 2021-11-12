@@ -49,23 +49,15 @@ DataBase::DataBase()
     }
 }
 
-bool DataBase::existsUser(QString userName, unsigned int passwordHash)
-{
-    for(auto& user : userList)
-    {
-        if(user.getUserName()==userName&&user.getPasswordHash()==passwordHash)
-            return true;
-    }
-    return false;
-}
 
-User& DataBase::findUser(QString userName, unsigned int passwordHash)
+User* DataBase::findUser(QString userName, unsigned int passwordHash)
 {
     for(auto& user : userList)
     {
         if(user.getUserName()==userName&&user.getPasswordHash()==passwordHash)
-            return user;
+            return &user;
     }
+    return nullptr;
 }
 
 void DataBase::addUser(User user)
