@@ -52,13 +52,13 @@ void MainWindow::logOut()
         if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
         {
             auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-            this->close();
+
             MainWindow w(foundUser,dataBase);
             w.show();
         }
         else
         {
-            this->close();
+
             QString message= "UserName/password combination is not correct.";
             QErrorMessage *errorMessage = QErrorMessage::qtHandler();
             errorMessage->showMessage(message);            
@@ -68,7 +68,7 @@ void MainWindow::logOut()
     {
         User user = User(userCredentials.first, userCredentials.second);
         dataBase->addUser(user);
-        this->close();
+
         MainWindow w(&user,dataBase);
         w.show();
     }
