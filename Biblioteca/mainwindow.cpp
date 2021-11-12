@@ -11,14 +11,19 @@ MainWindow::MainWindow(User* user, std::shared_ptr<DataBase> database ,QWidget *
     this->user=user;
     this->dataBase=database;
     QMenuBar* userBar = new QMenuBar(this);
-    QMenu* logOut = new QMenu();
-    logOut->setTitle("User");
+    this->setMenuBar(userBar);
+    QMenu* userMenu = new QMenu();
+    userMenu->setTitle("User");
     QAction* logOutAction = new QAction();
     logOutAction->setText("Log out");
     connect(logOutAction,&QAction::triggered,this,&MainWindow::logOut);
-    logOut->addAction(logOutAction);
-    userBar->addMenu(logOut);
-    this->setMenuBar(userBar);
+    userMenu->addAction(logOutAction);
+    userBar->addMenu(userMenu);
+    QAction* deleteUserAction = new QAction();
+    deleteUserAction->setText("Delete User");
+    connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
+    userMenu->addAction(deleteUserAction);
+
 }
 
 MainWindow::~MainWindow()
@@ -52,13 +57,11 @@ void MainWindow::logOut()
         if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
         {
             auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-
             MainWindow w(foundUser,dataBase);
             w.show();
         }
         else
         {
-
             QString message= "UserName/password combination is not correct.";
             QErrorMessage *errorMessage = QErrorMessage::qtHandler();
             errorMessage->showMessage(message);            
@@ -68,10 +71,15 @@ void MainWindow::logOut()
     {
         User user = User(userCredentials.first, userCredentials.second);
         dataBase->addUser(user);
-
         MainWindow w(&user,dataBase);
         w.show();
     }
+}
+
+void MainWindow::deleteCurrentUser()
+{
+    dataBase->removeUser(*user);
+    logOut();
 }
 
 

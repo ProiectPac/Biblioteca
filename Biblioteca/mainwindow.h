@@ -27,5 +27,6 @@ private:
     void addBorrowBook(Book book);
     void deleteBorrowBook(Book book);
     void logOut();
+    void deleteCurrentUser();
 };
 #endif // MAINWINDOW_H
