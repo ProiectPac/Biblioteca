@@ -51,7 +51,10 @@ void MainWindow::logOut()
     LoginDialog loginDialog;
     loginDialog.exec();
     auto userCredentials = loginDialog.getUserCredentials();
-
+    if(loginDialog.getAction()==LoginDialog::Actions::Nothing)
+    {
+        this->close();
+    }
     if(loginDialog.getAction()==LoginDialog::Actions::Login)
     {
         if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
@@ -64,7 +67,8 @@ void MainWindow::logOut()
         {
             QString message= "UserName/password combination is not correct.";
             QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-            errorMessage->showMessage(message);            
+            errorMessage->showMessage(message);
+            this->close();
         }
     }
     else if(loginDialog.getAction()==LoginDialog::Actions::Register)
