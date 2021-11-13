@@ -13,7 +13,27 @@ int main(int argc, char *argv[])
     loginDialog.exec();
     std::shared_ptr<DataBase> dataBase(new DataBase());
     auto userCredentials = loginDialog.getUserCredentials();
-
+    if(userCredentials.first=="" && userCredentials.second==0)
+    {
+        QString message= "UserName and Password can't be empty";
+        QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+        errorMessage->showMessage(message);
+        return a.exec();
+    }
+    if(userCredentials.first=="")
+    {
+        QString message= "UserName can't be empty";
+        QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+        errorMessage->showMessage(message);
+        return a.exec();
+    }
+    if(userCredentials.second==0)
+    {
+        QString message= "Password can't be empty";
+        QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+        errorMessage->showMessage(message);
+        return a.exec();
+    }
     if(loginDialog.getAction()==LoginDialog::Actions::Login)
     {
         if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
