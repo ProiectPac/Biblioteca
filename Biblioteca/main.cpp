@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
     bool hasError;
     do
     {
+        loginDialog.exec();
         hasError=false;
         auto userCredentials = loginDialog.getUserCredentials();
         if(userCredentials.first=="" && userCredentials.second==0)
