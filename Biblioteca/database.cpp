@@ -88,7 +88,28 @@ void DataBase::removeBook(Book book)
         if(book.getISBN()==availableBooks[i].getISBN())
             availableBooks.remove(i);
 }
+std::vector<Book*> DataBase::searchBooks(std::string& name,std::string& author,std::string& ISBN)
+{
+    for(int index=0; index<availableBooks.size(); index++)
+    {
+            std::string strName = availableBooks[index].getName().toStdString();
+            std::string strAuthor = availableBooks[index].getAuthor().toStdString();
+            std::string strISBN = availableBooks[index].getISBN().toStdString();
+            std::vector<Book*> searchResult;
+            if(strName.find(name)!=-1 ||strName == "")
+            {
+                if(strAuthor.find(author)!=-1 ||strAuthor == "")
+                {
+                    if(strISBN.find(ISBN)!=-1 ||strISBN == "")
+                    {
+                        searchResult.push_back(&availableBooks[index]);
+                    }
+                }
+            }
+            return searchResult;
+    }
 
+}
 DataBase::~DataBase()
 {
     std::ofstream fout("../Biblioteca/dataBase.txt");

@@ -21,6 +21,7 @@ public:
     QVector<Book> getAvailableBooks();
     void addAvailableBook(Book book);
     void removeBook(Book book);
+    std::vector<Book*> searchBooks(std::string&,std::string&,std::string&);
     ~DataBase();
 };
 
