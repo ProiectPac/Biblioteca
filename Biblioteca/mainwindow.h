@@ -28,6 +28,9 @@ public:
 
 private:
     void setUpUserBar();
+    void loginDialogFinished();
+    bool hasError=false;
+    LoginDialog* loginDialog;
     Ui::MainWindow *ui;
     User* user;
     std::shared_ptr<DataBase> dataBase;

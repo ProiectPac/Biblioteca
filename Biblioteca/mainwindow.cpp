@@ -20,6 +20,91 @@ void MainWindow::setUpUserBar()
     userMenu->addAction(deleteUserAction);
 }
 
+void MainWindow::loginDialogFinished()
+{
+    QErrorMessage* errorMessage = QErrorMessage::qtHandler();
+
+    auto userCredentials = loginDialog->getUserCredentials();
+
+    hasError=false;
+
+    if(loginDialog->getAction()!=LoginDialog::Actions::Nothing)
+    {
+        if(userCredentials.first=="" && userCredentials.second==0)
+        {
+            QString message= "UserName and Password can't be empty";
+            errorMessage->showMessage(message);
+
+            delete loginDialog;
+            loginDialog = new LoginDialog(this);
+            connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+            loginDialog->open();
+
+            hasError=true;
+
+        }
+        else
+        {
+            if(userCredentials.first=="")
+            {
+                QString message= "UserName can't be empty";
+                errorMessage->showMessage(message);
+
+                delete loginDialog;
+                loginDialog = new LoginDialog(this);
+                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+                loginDialog->open();
+
+                hasError=true;
+            }
+            if(userCredentials.second==0)
+            {
+                QString message= "Password can't be empty";
+
+                delete loginDialog;
+                loginDialog = new LoginDialog(this);
+                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+                loginDialog->open();
+
+                errorMessage->showMessage(message);
+                hasError=true;
+            }
+        }
+        if(hasError==false)
+        {
+            if(loginDialog->getAction()==LoginDialog::Actions::Login)
+            {
+                if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
+                {
+                    auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
+                    setUser(foundUser);
+                }
+                else
+                {
+                    QString message= "UserName/password combination is not correct.";
+                    QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+
+                    delete loginDialog;
+                    loginDialog = new LoginDialog(this);
+                    connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+                    loginDialog->open();
+
+                    errorMessage->showMessage(message);
+                    hasError=true;
+                }
+            }
+            else if(loginDialog->getAction()==LoginDialog::Actions::Register)
+            {
+                dataBase->addUser(User(userCredentials.first, userCredentials.second));
+                auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
+                setUser(foundUser);
+            }
+        }
+    }
+    else
+        this->close();
+}
+
 const std::shared_ptr<DataBase> &MainWindow::getDataBase() const
 {
     return dataBase;
@@ -36,16 +121,18 @@ void MainWindow::setUser(User *newUser)
     user = newUser;
 }
 
-void MainWindow::setDataBase(const std::shared_ptr<DataBase> &newDataBase)
-{
-    dataBase = newDataBase;
-}
-
 MainWindow::MainWindow() : QMainWindow()
   , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     setUpUserBar();
+    dataBase = std::shared_ptr<DataBase>(new DataBase());
+
+    delete loginDialog;
+    loginDialog = new LoginDialog(this);
+    connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+    loginDialog->open();
+
 }
 
 void MainWindow::addBorrowBook(Book book)
@@ -64,51 +151,10 @@ void MainWindow::deleteBorrowBook(Book book)
 
 void MainWindow::logOut()
 {
-
-    LoginDialog loginDialog;
-    loginDialog.exec();
-    auto userCredentials = loginDialog.getUserCredentials();
-    if(userCredentials.first=="" && userCredentials.second==0)
-    {
-        QString message= "UserName and Password can't be empty";
-        QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-        errorMessage->showMessage(message);
-    }
-    else
-    {
-        if(userCredentials.first=="")
-        {
-            QString message= "UserName can't be empty";
-            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-            errorMessage->showMessage(message);
-        }
-        if(userCredentials.second==0)
-        {
-            QString message= "Password can't be empty";
-            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-            errorMessage->showMessage(message);
-        }
-    }
-    if(loginDialog.getAction()==LoginDialog::Actions::Login)
-    {
-        if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
-        {
-            auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-            this->setUser(foundUser);
-        }
-        else
-        {
-            QString message= "UserName/password combination is not correct.";
-            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-            errorMessage->showMessage(message);
-        }
-    }
-    else if(loginDialog.getAction()==LoginDialog::Actions::Register)
-    {
-        dataBase->addUser(User(userCredentials.first, userCredentials.second));
-        auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-        this->setUser(foundUser);
-    }
+    delete loginDialog;
+    loginDialog = new LoginDialog(this);
+    connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+    loginDialog->open();
 }
 
 void MainWindow::deleteCurrentUser()

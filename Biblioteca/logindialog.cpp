@@ -3,7 +3,7 @@
 
 
 
-LoginDialog::LoginDialog()
+LoginDialog::LoginDialog(QWidget *parent) : QDialog(parent)
 {
     action = LoginDialog::Actions::Nothing;
 
@@ -43,6 +43,12 @@ QPair<QString, unsigned int> LoginDialog::getUserCredentials()
 LoginDialog::Actions LoginDialog::getAction() const
 {
     return action;
+}
+
+void LoginDialog::open()
+{
+    action=LoginDialog::Actions::Nothing;
+    QDialog::open();
 }
 
 unsigned int LoginDialog::FNVHash(QString str)

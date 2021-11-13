@@ -14,7 +14,7 @@
 class LoginDialog : public QDialog
 {
 public:
-    LoginDialog();
+    LoginDialog(QWidget *parent = nullptr);
     QPair<QString, unsigned int> getUserCredentials();
     enum class Actions
     {
@@ -24,7 +24,8 @@ public:
     } action;
 
     Actions getAction() const;
-
+public slots:
+    void open() override;
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;
