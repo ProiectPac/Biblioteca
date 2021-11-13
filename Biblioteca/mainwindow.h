@@ -17,10 +17,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(User* user,std::shared_ptr<DataBase> database,QWidget *parent = nullptr);
     ~MainWindow();
 
+    void setUser(User *newUser);
+
+    void setDataBase(const std::shared_ptr<DataBase> &newDataBase);
+    MainWindow();
+
+    const std::shared_ptr<DataBase> &getDataBase() const;
+
 private:
+    void setUpUserBar();
     Ui::MainWindow *ui;
     User* user;
     std::shared_ptr<DataBase> dataBase;

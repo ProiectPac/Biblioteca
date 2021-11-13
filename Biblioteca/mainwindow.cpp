@@ -3,13 +3,8 @@
 
 #include <dataBase.h>
 
-MainWindow::MainWindow(User* user, std::shared_ptr<DataBase> database ,QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+void MainWindow::setUpUserBar()
 {
-    ui->setupUi(this);
-    this->user=user;
-    this->dataBase=database;
     QMenuBar* userBar = new QMenuBar(this);
     this->setMenuBar(userBar);
     QMenu* userMenu = new QMenu();
@@ -23,12 +18,34 @@ MainWindow::MainWindow(User* user, std::shared_ptr<DataBase> database ,QWidget *
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
-
 }
+
+const std::shared_ptr<DataBase> &MainWindow::getDataBase() const
+{
+    return dataBase;
+}
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::setUser(User *newUser)
+{
+    user = newUser;
+}
+
+void MainWindow::setDataBase(const std::shared_ptr<DataBase> &newDataBase)
+{
+    dataBase = newDataBase;
+}
+
+MainWindow::MainWindow() : QMainWindow()
+  , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    setUpUserBar();
 }
 
 void MainWindow::addBorrowBook(Book book)
@@ -51,32 +68,46 @@ void MainWindow::logOut()
     LoginDialog loginDialog;
     loginDialog.exec();
     auto userCredentials = loginDialog.getUserCredentials();
-    if(loginDialog.getAction()==LoginDialog::Actions::Nothing)
+    if(userCredentials.first=="" && userCredentials.second==0)
     {
-        this->close();
+        QString message= "UserName and Password can't be empty";
+        QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+        errorMessage->showMessage(message);
+    }
+    else
+    {
+        if(userCredentials.first=="")
+        {
+            QString message= "UserName can't be empty";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
+        if(userCredentials.second==0)
+        {
+            QString message= "Password can't be empty";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
     }
     if(loginDialog.getAction()==LoginDialog::Actions::Login)
     {
         if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
         {
             auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-            MainWindow w(foundUser,dataBase);
-            w.show();
+            this->setUser(foundUser);
         }
         else
         {
             QString message= "UserName/password combination is not correct.";
             QErrorMessage *errorMessage = QErrorMessage::qtHandler();
             errorMessage->showMessage(message);
-            this->close();
         }
     }
     else if(loginDialog.getAction()==LoginDialog::Actions::Register)
     {
-        User user = User(userCredentials.first, userCredentials.second);
-        dataBase->addUser(user);
-        MainWindow w(&user,dataBase);
-        w.show();
+        dataBase->addUser(User(userCredentials.first, userCredentials.second));
+        auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
+        this->setUser(foundUser);
     }
 }
 
