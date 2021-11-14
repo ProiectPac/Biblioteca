@@ -88,7 +88,7 @@ void DataBase::removeBook(Book book)
         if(book.getISBN()==availableBooks[i].getISBN())
             availableBooks.remove(i);
 }
-int DataBase::levenshteinDistance(std::string& draft, std::string& original)
+int DataBase::levenshteinDistance(std::string draft, std::string original)
 {
 
         std::vector<std::vector<int>> matrix;
@@ -104,7 +104,7 @@ int DataBase::levenshteinDistance(std::string& draft, std::string& original)
         {
             for (int index2 = matrix[index].size() - 2; index2 >= 0;  index2--)
             {
-                matrix[index][index2] = std::min(matrix[index + 1][index2], matrix[index + 1][index2 + 1], matrix[index][index2 + 1]);
+                matrix[index][index2] = std::min(matrix[index + 1][index2], std::min(matrix[index + 1][index2 + 1], matrix[index][index2 + 1]));
 
                 if (draft[index2] != original[index])
                 {
@@ -114,28 +114,60 @@ int DataBase::levenshteinDistance(std::string& draft, std::string& original)
         }
         return matrix[0][0];
 }
-std::vector<Book*> DataBase::searchBooks(std::string& name,std::string& author,std::string& ISBN)
+QVector<Book> DataBase::searchBooks(std::string& name,std::string& author,std::string& ISBN)
 {
-    for(int index=0; index<availableBooks.size(); index++)
+    std::vector<Book> searchResult;
+    for( auto book:availableBooks)
     {
-            std::string strName = availableBooks[index].getName().toStdString();
-            std::string strAuthor = availableBooks[index].getAuthor().toStdString();
-            std::string strISBN = availableBooks[index].getISBN().toStdString();
-            std::vector<Book*> searchResult;
-            if(strName.find(name)!=-1 ||strName == "")
-            {
-                if(strAuthor.find(author)!=-1 ||strAuthor == "")
-                {
-                    if(strISBN.find(ISBN)!=-1 ||strISBN == "")
-                    {
-                        searchResult.push_back(&availableBooks[index]);
-                    }
-                }
-            }
-            return searchResult;
+        searchResult.push_back(book);
     }
+    class comparator
+    {
+        std::string name;
+        std::string author;
+        std::string ISBN;
+    public:
+        comparator(std::string name,std::string author,std::string ISBN)
+        {
+            this->name = name;
+            this->author = author;
+            this->ISBN = ISBN;
+        }
+        bool operator ()(Book book1, Book book2)
+        {
+            int nameDistance = levenshteinDistance(name,book1.getName().toStdString());
+            int authorDistance = levenshteinDistance(author,book1.getAuthor().toStdString());
+            int ISBNDistance = levenshteinDistance(ISBN,book1.getISBN().toStdString());
+            if(name == "")
+                nameDistance=0;
+            if(author == "")
+                authorDistance=0;
+            if(ISBN == "")
+                ISBNDistance=0;
 
+            float meanDistance1 = (nameDistance + authorDistance + ISBNDistance)/3.f;
+
+             nameDistance = levenshteinDistance(name,book2.getName().toStdString());
+            authorDistance = levenshteinDistance(author,book2.getAuthor().toStdString());
+             ISBNDistance = levenshteinDistance(ISBN,book2.getISBN().toStdString());
+            if(name == "")
+                nameDistance=0;
+            if(author == "")
+                authorDistance=0;
+            if(ISBN == "")
+                ISBNDistance=0;
+
+            float meanDistance2 = (nameDistance + authorDistance + ISBNDistance)/3.f;
+
+            return meanDistance1>meanDistance2;
+        }
+    };
+
+    std::sort(searchResult.begin(),searchResult.end(),comparator(name,author,ISBN));
+
+    return QVector<Book>(searchResult.begin(),searchResult.end());
 }
+
 DataBase::~DataBase()
 {
     std::ofstream fout("../Biblioteca/dataBase.txt");
