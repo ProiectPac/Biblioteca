@@ -7,7 +7,7 @@
 #include<QVector>
 #include<QList>
 #include<fstream>
-
+#include<algorithm>
 class DataBase
 {
 private:
@@ -21,6 +21,8 @@ public:
     QVector<Book> getAvailableBooks();
     void addAvailableBook(Book book);
     void removeBook(Book book);
+    static int levenshteinDistance(std::string,std::string);
+    QVector<Book> searchBooks(std::string&,std::string&,std::string&);
     ~DataBase();
 };
 
