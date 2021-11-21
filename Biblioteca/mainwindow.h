@@ -12,6 +12,9 @@
 #include <QTextBrowser>
 #include "borderlayout.h"
 #include <QListView>
+#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QFormLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

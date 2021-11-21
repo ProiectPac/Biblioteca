@@ -110,7 +110,7 @@ void MainWindow::loginDialogFinished()
 
 void MainWindow::setUpUI()
 {
-    resize(800, 600);
+    resize(1920, 1080);
 
     bookContent = new QTextBrowser;
     bookContent->setPlainText("Book content");
@@ -119,10 +119,52 @@ void MainWindow::setUpUI()
     availableBooksList = new QListView;
     borrowedBooksList = new QListView;
 
+    QGroupBox* availableBookBox = new QGroupBox;
+
+    QGroupBox* availableBooksSearchBox = new QGroupBox;
+    QVBoxLayout* availableBooksLayout = new QVBoxLayout;
+
+    QFormLayout* availableBooksSearch = new QFormLayout;
+    QLineEdit* availabeleBooksNameLineEdit = new QLineEdit;
+    QLineEdit* availabeleBooksAuthorLineEdit = new QLineEdit;
+    QLineEdit* availabeleBooksISBNLineEdit = new QLineEdit;
+
+    availableBooksSearch->addRow("Name:",availabeleBooksNameLineEdit);
+    availableBooksSearch->addRow("Author:",availabeleBooksAuthorLineEdit);
+    availableBooksSearch->addRow("ISBN:",availabeleBooksISBNLineEdit);
+
+    availableBooksSearchBox->setLayout(availableBooksSearch);
+
+    availableBooksLayout->addWidget(availableBooksSearchBox);
+    availableBooksLayout->addWidget(availableBooksList);
+
+    availableBookBox->setLayout(availableBooksLayout);
+
+    QGroupBox* borrowedBookBox = new QGroupBox;
+
+    QGroupBox* borrowedBooksSearchBox = new QGroupBox;
+    QVBoxLayout* borrowedBooksLayout = new QVBoxLayout;
+
+    QFormLayout* borrowedBooksSearch = new QFormLayout;
+    QLineEdit* borrowedBooksNameLineEdit = new QLineEdit;
+    QLineEdit* borrowedBooksAuthorLineEdit = new QLineEdit;
+    QLineEdit* borrowedBooksISBNLineEdit = new QLineEdit;
+
+    borrowedBooksSearch->addRow("Name:",borrowedBooksNameLineEdit);
+    borrowedBooksSearch->addRow("Author:",borrowedBooksAuthorLineEdit);
+    borrowedBooksSearch->addRow("ISBN:",borrowedBooksISBNLineEdit);
+
+    borrowedBooksSearchBox->setLayout(borrowedBooksSearch);
+
+    borrowedBooksLayout->addWidget(borrowedBooksSearchBox);
+    borrowedBooksLayout->addWidget(borrowedBooksList);
+
+    borrowedBookBox->setLayout(borrowedBooksLayout);
+
     layout = new BorderLayout;
     layout->addWidget(bookContent, BorderLayout::Center);
-    layout->addWidget(availableBooksList, BorderLayout::West);
-    layout->addWidget(borrowedBooksList, BorderLayout::East);
+    layout->addWidget(availableBookBox, BorderLayout::West);
+    layout->addWidget(borrowedBookBox, BorderLayout::East);
 
     QWidget *window = new QWidget();
     window->setLayout(layout);
