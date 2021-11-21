@@ -169,8 +169,37 @@ void MainWindow::deleteCurrentUser()
 
 void MainWindow::changeCurrentUserPassword()
 {
-    QString newPassword = QInputDialog::getText(this,"Change Password","Password");
-    user->setPasswordHash(LoginDialog::FNVHash(newPassword));
+    QInputDialog *passwordDialog = new QInputDialog;
+    passwordDialog->setWindowTitle("Change Password");
+    passwordDialog->setLabelText("New Password");
+    QInputDialog *repeatPasswordDialog = new QInputDialog;
+    repeatPasswordDialog->setWindowTitle("Change Password");
+    repeatPasswordDialog->setLabelText("Repeat Password");
+    passwordDialog->exec();
+    repeatPasswordDialog->exec();
+    QString newPassword=passwordDialog->textValue();
+    QString repeatPassword=repeatPasswordDialog->textValue();
+    if(passwordDialog->result()==QDialog::Accepted && repeatPasswordDialog->result()==QDialog::Accepted)
+    {
+        if(newPassword==""||repeatPassword=="")
+        {
+            QString message= "Password can't be empty";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
+        else if(newPassword!=repeatPassword)
+        {
+            QString message= "Passwords do not match";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
+        else
+        {
+            user->setPasswordHash(LoginDialog::FNVHash(newPassword));
+        }
+    }
+    delete passwordDialog;
+    delete repeatPasswordDialog;
 }
 
 
