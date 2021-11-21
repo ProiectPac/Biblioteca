@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <dataBase.h>
+#include <database.h>
 
 void MainWindow::setUpUserBar()
 {
@@ -18,6 +18,10 @@ void MainWindow::setUpUserBar()
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
+    QAction* changeUserPasswordAction = new QAction();
+    changeUserPasswordAction->setText("Change Password User");
+    connect(changeUserPasswordAction,&QAction::triggered,this,&MainWindow::changeCurrentUserPassword);
+    userMenu->addAction(changeUserPasswordAction);
 }
 
 void MainWindow::loginDialogFinished()
@@ -161,6 +165,41 @@ void MainWindow::deleteCurrentUser()
 {
     dataBase->removeUser(*user);
     logOut();
+}
+
+void MainWindow::changeCurrentUserPassword()
+{
+    QInputDialog *passwordDialog = new QInputDialog;
+    passwordDialog->setWindowTitle("Change Password");
+    passwordDialog->setLabelText("New Password");
+    QInputDialog *repeatPasswordDialog = new QInputDialog;
+    repeatPasswordDialog->setWindowTitle("Change Password");
+    repeatPasswordDialog->setLabelText("Repeat Password");
+    passwordDialog->exec();
+    repeatPasswordDialog->exec();
+    QString newPassword=passwordDialog->textValue();
+    QString repeatPassword=repeatPasswordDialog->textValue();
+    if(passwordDialog->result()==QDialog::Accepted && repeatPasswordDialog->result()==QDialog::Accepted)
+    {
+        if(newPassword==""||repeatPassword=="")
+        {
+            QString message= "Password can't be empty";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
+        else if(newPassword!=repeatPassword)
+        {
+            QString message= "Passwords do not match";
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+            errorMessage->showMessage(message);
+        }
+        else
+        {
+            user->setPasswordHash(LoginDialog::FNVHash(newPassword));
+        }
+    }
+    delete passwordDialog;
+    delete repeatPasswordDialog;
 }
 
 
