@@ -25,11 +25,19 @@ public:
     } action;
 
     Actions getAction() const;
+
+    ~LoginDialog();
 public slots:
     void open() override;
 private:
-    QLineEdit *nameLineEdit;
-    QLineEdit *passwordLineEdit;
+    QPushButton *loginButton = nullptr;
+    QPushButton *registerButton = nullptr;
+    QLabel *nameLabel = nullptr;
+    QLabel *passwordLabel = nullptr;
+    QGridLayout *gridLayout = nullptr;
+    QLineEdit *nameLineEdit = nullptr;
+    QLineEdit *passwordLineEdit = nullptr;
+    unsigned int FNVHash(const QString& str);
 private slots:
     void loginOnClick();
     void registerOnClick();

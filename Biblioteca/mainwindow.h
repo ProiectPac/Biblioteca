@@ -26,19 +26,23 @@ public:
     void setDataBase(const std::shared_ptr<DataBase> &newDataBase);
     MainWindow();
 
-    const std::shared_ptr<DataBase> &getDataBase() const;
+    const std::shared_ptr<DataBase> getDataBase() const;
 
 private:
+    QMenuBar* userBar = nullptr;
+    QMenu* userMenu = nullptr;
+    QAction* logOutAction = nullptr;
+    QAction* deleteUserAction = nullptr;
     void setUpUserBar();
     void loginDialogFinished();
     bool hasError=false;
     LoginDialog* loginDialog = nullptr;
-    Ui::MainWindow *ui;
-    User* user;
+    Ui::MainWindow *ui = nullptr;
+    User* user = nullptr;
     SQLDataBase sqlDataBase;
     std::shared_ptr<DataBase> dataBase;
-    void addBorrowBook(Book book);
-    void deleteBorrowBook(Book book);
+    void addBorrowBook(Book& book);
+    void deleteBorrowBook(Book& book);
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();

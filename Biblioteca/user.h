@@ -14,15 +14,16 @@ private:
     QVector<Book>borrowedBooks;
 public:
     User();
-    User(QString userName, unsigned int passwordHash);
+    ~User();
+    User(const QString& userName, const unsigned int& passwordHash);
 
     const QString &getUserName() const;
-    const unsigned int getPasswordHash();
+    unsigned int getPasswordHash() const;
     void setUserName(const QString &newUserName);
-    void setPasswordHash(unsigned int newPasswordHash);
-    const QVector<Book> &getBorrowedBooks() const;
-    void addBorrowedBook(Book newBook);
-    void removeBorrowedBook(Book book);
+    void setPasswordHash(const unsigned int& newPasswordHash);
+    QVector<Book> &getBorrowedBooks();
+    void addBorrowedBook(const Book& newBook);
+    void removeBorrowedBook(const Book& book);
 };
 
 #endif // USER_H
