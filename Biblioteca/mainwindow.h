@@ -7,6 +7,8 @@
 #include "logindialog.h"
 #include <QErrorMessage>
 #include <memory>
+#include "sqldatabase.h"
+#include <QInputDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,10 +39,12 @@ private:
     LoginDialog* loginDialog = nullptr;
     Ui::MainWindow *ui = nullptr;
     User* user = nullptr;
+    SQLDataBase sqlDataBase;
     std::shared_ptr<DataBase> dataBase;
     void addBorrowBook(Book& book);
     void deleteBorrowBook(Book& book);
     void logOut();
     void deleteCurrentUser();
+    void changeCurrentUserPassword();
 };
 #endif // MAINWINDOW_H

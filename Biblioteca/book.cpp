@@ -15,6 +15,31 @@ const QString &Book::getName() const
     return name;
 }
 
+const int &Book::getID() const
+{
+    return ID;
+}
+
+const int &Book::getBooksCount() const
+{
+    return booksCount;
+}
+
+const int &Book::getOriginalPublicationYear() const
+{
+    return originalPublicationYear;
+}
+
+const QString &Book::getLanguage() const
+{
+    return language;
+}
+
+const QString &Book::getImageURL() const
+{
+    return imageURL;
+}
+
 int Book::getRemaingDays() const
 {
     return remaingDays;
