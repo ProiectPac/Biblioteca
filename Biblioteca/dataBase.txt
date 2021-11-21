@@ -1,4 +1,4 @@
-6
+7
 dani 317557796
 2
 Amintiri din copilarie
@@ -15,18 +15,14 @@ Nae
 Indoaie
 2654
 7
-gigi 1042775456
-0
 fdssaf 1294896195
 0
 asta 4005704355
 0
 asidsai 3655862572
 0
-2
-abba
-ttr
-5435
-rert
-treyt
-3456
+2 0
+0
+gigi 1042775456
+0
+0

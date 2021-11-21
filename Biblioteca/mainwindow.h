@@ -7,7 +7,7 @@
 #include "logindialog.h"
 #include <QErrorMessage>
 #include <memory>
-
+#include <QInputDialog>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -38,5 +38,6 @@ private:
     void deleteBorrowBook(Book book);
     void logOut();
     void deleteCurrentUser();
+    void changeCurrentUserPassword();
 };
 #endif // MAINWINDOW_H

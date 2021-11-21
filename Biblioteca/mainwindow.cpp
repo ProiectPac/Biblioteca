@@ -20,7 +20,7 @@ void MainWindow::setUpUserBar()
     userMenu->addAction(deleteUserAction);
     QAction* changeUserPasswordAction = new QAction();
     changeUserPasswordAction->setText("Change Password User");
-    //connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
+    connect(changeUserPasswordAction,&QAction::triggered,this,&MainWindow::changeCurrentUserPassword);
     userMenu->addAction(changeUserPasswordAction);
 }
 
@@ -165,6 +165,12 @@ void MainWindow::deleteCurrentUser()
 {
     dataBase->removeUser(*user);
     logOut();
+}
+
+void MainWindow::changeCurrentUserPassword()
+{
+    QString newPassword = QInputDialog::getText(this,"Change Password","Password");
+    user->setPasswordHash(LoginDialog::FNVHash(newPassword));
 }
 
 
