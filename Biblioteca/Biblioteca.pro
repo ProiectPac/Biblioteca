@@ -14,8 +14,8 @@ SOURCES += \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    sqldatabase.cpp \
     sqlite3.c \
+    sqldatabase.cpp \
     user.cpp
 
 HEADERS += \

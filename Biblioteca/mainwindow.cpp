@@ -42,8 +42,7 @@ void MainWindow::loginDialogFinished()
             delete loginDialog;
             loginDialog = new LoginDialog(this);
             connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-            loginDialog->open();
-
+            connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
             hasError=true;
 
         }
@@ -57,7 +56,7 @@ void MainWindow::loginDialogFinished()
                 delete loginDialog;
                 loginDialog = new LoginDialog(this);
                 connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                loginDialog->open();
+                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
 
                 hasError=true;
             }
@@ -68,7 +67,7 @@ void MainWindow::loginDialogFinished()
                 delete loginDialog;
                 loginDialog = new LoginDialog(this);
                 connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                loginDialog->open();
+                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
 
                 errorMessage->showMessage(message);
                 hasError=true;
@@ -91,7 +90,7 @@ void MainWindow::loginDialogFinished()
                     delete loginDialog;
                     loginDialog = new LoginDialog(this);
                     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                    loginDialog->open();
+                    connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
 
                     errorMessage->showMessage(message);
                     hasError=true;
