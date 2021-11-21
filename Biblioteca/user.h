@@ -14,6 +14,7 @@ private:
     QVector<Book>borrowedBooks;
 public:
     User();
+    ~User();
     User(const QString& userName, const unsigned int& passwordHash);
 
     const QString &getUserName() const;

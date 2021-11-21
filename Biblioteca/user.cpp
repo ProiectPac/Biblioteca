@@ -46,6 +46,11 @@ User::User()
     passwordHash=0;
 }
 
+User::~User()
+{
+
+}
+
 User::User(const QString& userName, const unsigned int& passwordHash)
 {
     this->userName=userName;

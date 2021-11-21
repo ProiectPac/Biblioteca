@@ -13,18 +13,18 @@ LoginDialog::LoginDialog(QWidget *parent) : QDialog(parent)
     nameLineEdit = new QLineEdit(this);
     passwordLineEdit = new QLineEdit(this);
 
-    QPushButton *loginButton = new QPushButton("Login", this);
+    loginButton = new QPushButton("Login", this);
     QObject::connect(loginButton,&QPushButton::clicked,this,&LoginDialog::loginOnClick);
-    QPushButton *registerButton = new QPushButton("Register", this);
+    registerButton = new QPushButton("Register", this);
     QObject::connect(registerButton,&QPushButton::clicked,this,&LoginDialog::registerOnClick);
 
-    QLabel *nameLabel = new QLabel(tr("Name:"));
+    nameLabel = new QLabel(tr("Name:"));
     nameLabel->setBuddy(nameLineEdit);
 
-    QLabel *passwordLabel = new QLabel(tr("Password:"));
+    passwordLabel = new QLabel(tr("Password:"));
     passwordLabel->setBuddy(passwordLineEdit);
 
-    QGridLayout *gridLayout = new QGridLayout;
+    gridLayout = new QGridLayout;
 
     gridLayout->addWidget(nameLabel, 0, 0);
     gridLayout->addWidget(nameLineEdit, 0, 1);
@@ -43,6 +43,17 @@ QPair<QString, unsigned int> LoginDialog::getUserCredentials()
 LoginDialog::Actions LoginDialog::getAction() const
 {
     return action;
+}
+
+LoginDialog::~LoginDialog()
+{
+    delete loginButton;
+    delete registerButton;
+    delete nameLabel;
+    delete passwordLabel;
+    delete gridLayout;
+    delete nameLineEdit;
+    delete passwordLineEdit;
 }
 
 void LoginDialog::open()

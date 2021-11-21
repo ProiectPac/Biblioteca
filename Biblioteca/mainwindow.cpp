@@ -5,16 +5,16 @@
 
 void MainWindow::setUpUserBar()
 {
-    QMenuBar* userBar = new QMenuBar(this);
+    userBar = new QMenuBar(this);
     this->setMenuBar(userBar);
-    QMenu* userMenu = new QMenu();
+    userMenu = new QMenu();
     userMenu->setTitle("User");
-    QAction* logOutAction = new QAction();
+    logOutAction = new QAction();
     logOutAction->setText("Log out");
     connect(logOutAction,&QAction::triggered,this,&MainWindow::logOut);
     userMenu->addAction(logOutAction);
     userBar->addMenu(userMenu);
-    QAction* deleteUserAction = new QAction();
+    deleteUserAction = new QAction();
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
@@ -112,7 +112,13 @@ const std::shared_ptr<DataBase> MainWindow::getDataBase() const
 
 
 MainWindow::~MainWindow()
-{
+{ 
+    delete userBar;
+    delete userMenu;
+    delete logOutAction;
+    delete deleteUserAction;
+    delete user;
+    delete loginDialog;
     delete ui;
 }
 

@@ -27,12 +27,16 @@ public:
     const std::shared_ptr<DataBase> getDataBase() const;
 
 private:
+    QMenuBar* userBar = nullptr;
+    QMenu* userMenu = nullptr;
+    QAction* logOutAction = nullptr;
+    QAction* deleteUserAction = nullptr;
     void setUpUserBar();
     void loginDialogFinished();
     bool hasError=false;
-    LoginDialog* loginDialog;
-    Ui::MainWindow *ui;
-    User* user;
+    LoginDialog* loginDialog = nullptr;
+    Ui::MainWindow *ui = nullptr;
+    User* user = nullptr;
     std::shared_ptr<DataBase> dataBase;
     void addBorrowBook(Book& book);
     void deleteBorrowBook(Book& book);
