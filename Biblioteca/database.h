@@ -8,6 +8,7 @@
 #include<QList>
 #include<fstream>
 #include<algorithm>
+
 class DataBase
 {
 private:

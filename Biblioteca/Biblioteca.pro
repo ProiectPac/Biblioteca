@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,6 +14,8 @@ SOURCES += \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    sqldatabase.cpp \
+    sqlite3.c \
     user.cpp
 
 HEADERS += \
@@ -21,6 +23,7 @@ HEADERS += \
     database.h \
     logindialog.h \
     mainwindow.h \
+    sqldatabase.h \
     user.h
 
 FORMS += \
