@@ -51,7 +51,7 @@ void LoginDialog::open()
     QDialog::open();
 }
 
-unsigned int LoginDialog::FNVHash(QString str)
+unsigned int LoginDialog::FNVHash(const QString& str)
 {
     const unsigned int fnv_prime = 0x811C9DC5;
     unsigned int hash = 0;

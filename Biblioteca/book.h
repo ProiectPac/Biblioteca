@@ -16,8 +16,8 @@ public:
     const QString &getAuthor() const;
     const QString &getISBN() const;
     const QString &getName() const;
-    int getRemaingDays() const;
-    void setRemaingDays(const int& newRemaingDays);
+    int getRemaingDays()const;
+    void setRemaingDays(int newRemaingDays);
 };
 
 #endif // BOOK_H

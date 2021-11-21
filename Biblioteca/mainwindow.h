@@ -19,12 +19,12 @@ class MainWindow : public QMainWindow
 public:
     ~MainWindow();
 
-    void setUser(const User *newUser);
+    void setUser(User *newUser);
 
     void setDataBase(const std::shared_ptr<DataBase> &newDataBase);
     MainWindow();
 
-    const std::shared_ptr<DataBase> &getDataBase() const;
+    const std::shared_ptr<DataBase> getDataBase() const;
 
 private:
     void setUpUserBar();
@@ -34,8 +34,8 @@ private:
     Ui::MainWindow *ui;
     User* user;
     std::shared_ptr<DataBase> dataBase;
-    void addBorrowBook(const Book& book);
-    void deleteBorrowBook(Book book);
+    void addBorrowBook(Book& book);
+    void deleteBorrowBook(Book& book);
     void logOut();
     void deleteCurrentUser();
 };

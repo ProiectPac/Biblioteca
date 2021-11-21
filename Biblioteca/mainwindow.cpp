@@ -105,7 +105,7 @@ void MainWindow::loginDialogFinished()
         this->close();
 }
 
-const std::shared_ptr<DataBase> &MainWindow::getDataBase() const
+const std::shared_ptr<DataBase> MainWindow::getDataBase() const
 {
     return dataBase;
 }
@@ -116,7 +116,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setUser(User *newUser)
+void MainWindow::setUser( User *newUser)
 {
     user = newUser;
 }
@@ -135,14 +135,14 @@ MainWindow::MainWindow() : QMainWindow()
 
 }
 
-void MainWindow::addBorrowBook(Book book)
+void MainWindow::addBorrowBook(Book& book)
 {
     dataBase->removeBook(book);
     book.setRemaingDays(14);
     user->addBorrowedBook(book);
 }
 
-void MainWindow::deleteBorrowBook(Book book)
+void MainWindow::deleteBorrowBook(Book& book)
 {
     user->removeBorrowedBook(book);
     book.setRemaingDays(-1);

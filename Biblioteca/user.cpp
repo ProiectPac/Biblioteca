@@ -5,7 +5,7 @@ const QString &User::getUserName() const
     return userName;
 }
 
-const unsigned int User::getPasswordHash()
+unsigned int User::getPasswordHash() const
 {
     return passwordHash;
 }
@@ -15,22 +15,22 @@ void User::setUserName(const QString &newUserName)
     userName = newUserName;
 }
 
-void User::setPasswordHash(unsigned int newPasswordHash)
+void User::setPasswordHash(const unsigned int& newPasswordHash)
 {
     passwordHash = newPasswordHash;
 }
 
-const QVector<Book> &User::getBorrowedBooks() const
+QVector<Book> &User::getBorrowedBooks()
 {
     return borrowedBooks;
 }
 
-void User::addBorrowedBook(Book newBook)
+void User::addBorrowedBook(const Book& newBook)
 {
     borrowedBooks.push_back(newBook);
 }
 
-void User::removeBorrowedBook(Book book)
+void User::removeBorrowedBook(const Book& book)
 {
     for(int index=0;index<borrowedBooks.size();++index)
     {
@@ -46,7 +46,7 @@ User::User()
     passwordHash=0;
 }
 
-User::User(QString userName, unsigned int passwordHash)
+User::User(const QString& userName, const unsigned int& passwordHash)
 {
     this->userName=userName;
     this->passwordHash=passwordHash;

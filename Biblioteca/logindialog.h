@@ -29,7 +29,7 @@ public slots:
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;
-    unsigned int FNVHash(QString str);
+    unsigned int FNVHash(const QString& str);
 
 private slots:
     void loginOnClick();
