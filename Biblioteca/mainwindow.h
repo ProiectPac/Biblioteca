@@ -9,6 +9,9 @@
 #include <memory>
 #include "sqldatabase.h"
 #include <QInputDialog>
+#include <QTextBrowser>
+#include "borderlayout.h"
+#include <QListView>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,14 +36,22 @@ private:
     QMenu* userMenu = nullptr;
     QAction* logOutAction = nullptr;
     QAction* deleteUserAction = nullptr;
-    void setUpUserBar();
-    void loginDialogFinished();
-    bool hasError=false;
+    QTextBrowser *bookContent = nullptr;
+    BorderLayout *layout = nullptr;
     LoginDialog* loginDialog = nullptr;
     Ui::MainWindow *ui = nullptr;
     User* user = nullptr;
+    QListView* availableBooksList=nullptr;
+    QListView* borrowedBooksList=nullptr;
+
+    bool hasError=false;
+
     SQLDataBase sqlDataBase;
     std::shared_ptr<DataBase> dataBase;
+
+    void setUpUserBar();
+    void loginDialogFinished();
+    void setUpUI();
     void addBorrowBook(Book& book);
     void deleteBorrowBook(Book& book);
     void logOut();

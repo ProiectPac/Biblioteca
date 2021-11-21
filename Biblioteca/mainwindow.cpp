@@ -108,6 +108,28 @@ void MainWindow::loginDialogFinished()
         this->close();
 }
 
+void MainWindow::setUpUI()
+{
+    resize(800, 600);
+
+    bookContent = new QTextBrowser;
+    bookContent->setPlainText("Book content");
+
+
+    availableBooksList = new QListView;
+    borrowedBooksList = new QListView;
+
+    layout = new BorderLayout;
+    layout->addWidget(bookContent, BorderLayout::Center);
+    layout->addWidget(availableBooksList, BorderLayout::West);
+    layout->addWidget(borrowedBooksList, BorderLayout::East);
+
+    QWidget *window = new QWidget();
+    window->setLayout(layout);
+
+    setCentralWidget(window);
+}
+
 const std::shared_ptr<DataBase> MainWindow::getDataBase() const
 {
     return dataBase;
@@ -120,8 +142,11 @@ MainWindow::~MainWindow()
     delete userMenu;
     delete logOutAction;
     delete deleteUserAction;
-    delete user;
     delete loginDialog;
+    delete bookContent;
+    delete availableBooksList;
+    delete borrowedBooksList;
+    delete layout;
     delete ui;
 }
 
@@ -131,10 +156,10 @@ void MainWindow::setUser( User *newUser)
 }
 
 MainWindow::MainWindow() : QMainWindow()
-  , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    setUpUI();
     setUpUserBar();
+
     dataBase = std::shared_ptr<DataBase>(new DataBase());
 
     delete loginDialog;
