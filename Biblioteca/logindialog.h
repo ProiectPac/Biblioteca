@@ -16,6 +16,7 @@ class LoginDialog : public QDialog
 public:
     LoginDialog(QWidget *parent = nullptr);
     QPair<QString, unsigned int> getUserCredentials();
+    static unsigned int FNVHash(QString str);
     enum class Actions
     {
         Nothing,
@@ -29,8 +30,6 @@ public slots:
 private:
     QLineEdit *nameLineEdit;
     QLineEdit *passwordLineEdit;
-    unsigned int FNVHash(QString str);
-
 private slots:
     void loginOnClick();
     void registerOnClick();

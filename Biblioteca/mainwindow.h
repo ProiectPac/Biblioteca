@@ -8,6 +8,7 @@
 #include <QErrorMessage>
 #include <memory>
 #include "sqldatabase.h"
+#include <QInputDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,5 +41,6 @@ private:
     void deleteBorrowBook(Book book);
     void logOut();
     void deleteCurrentUser();
+    void changeCurrentUserPassword();
 };
 #endif // MAINWINDOW_H
