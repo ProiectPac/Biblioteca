@@ -12,12 +12,12 @@ private:
     int remaingDays;
 public:
     Book();
-    Book(QString name,QString author,QString ISBN,int remaingDays);
+    Book(const QString& name,const QString& author,const QString& ISBN,const int& remaingDays);
     const QString &getAuthor() const;
     const QString &getISBN() const;
     const QString &getName() const;
     int getRemaingDays() const;
-    void setRemaingDays(int newRemaingDays);
+    void setRemaingDays(const int& newRemaingDays);
 };
 
 #endif // BOOK_H

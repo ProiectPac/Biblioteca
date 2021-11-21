@@ -32,7 +32,7 @@ Book::Book()
     ISBN="";
 }
 
-Book::Book(QString name,QString author,QString ISBN,int remaingDays)
+Book::Book(const QString& name,const QString& author,const QString& ISBN,const int& remaingDays)
 {
     this->name=name;
     this->author=author;
