@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <dataBase.h>
+#include <database.h>
 
 void MainWindow::setUpUserBar()
 {
@@ -18,6 +18,10 @@ void MainWindow::setUpUserBar()
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
+    QAction* changeUserPasswordAction = new QAction();
+    changeUserPasswordAction->setText("Change Password User");
+    //connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
+    userMenu->addAction(changeUserPasswordAction);
 }
 
 void MainWindow::loginDialogFinished()
