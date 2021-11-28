@@ -202,6 +202,8 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
+    User gigi = sqlDataBase.findUser("gigi",1042775456);
+
 
     delete loginDialog;
     loginDialog = new LoginDialog(this);

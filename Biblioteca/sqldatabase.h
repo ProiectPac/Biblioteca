@@ -15,6 +15,7 @@ private:
 public:
     void addUser(User user);
     SQLDataBase();
+    User findUser(QString name, unsigned int passwordHash);
 };
 
 #endif // SQLDATABASE_H
