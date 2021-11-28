@@ -79,3 +79,12 @@ void SQLDataBase::addBook(Book book)
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
+
+void SQLDataBase::removeBook(QString title)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM books WHERE title = ?;");
+    query.addBindValue(title);
+    if(!query.exec())
+        qWarning() << "ERROR: " << query.lastError().text();
+}
