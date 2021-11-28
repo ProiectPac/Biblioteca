@@ -54,3 +54,11 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
     else
       return User();
 }
+void SQLDataBase::removeUser(QString name)
+{
+    QSqlQuery query;
+    query.prepare("DELETE FROM users WHERE name = ?;");
+    query.addBindValue(name);
+    if(!query.exec())
+       qWarning() << "ERROR: " << query.lastError().text();
+}

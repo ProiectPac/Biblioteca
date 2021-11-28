@@ -16,6 +16,7 @@ public:
     void addUser(User user);
     SQLDataBase();
     User findUser(QString name, unsigned int passwordHash);
+    void removeUser(QString name);
 };
 
 #endif // SQLDATABASE_H
