@@ -202,9 +202,7 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
-    User gigi = sqlDataBase.findUser("gigi",1042775456);
-    //sqlDataBase.removeBook("Amintirile lui Gigi");
-    auto books = sqlDataBase.getAvailableBooks();
+    sqlDataBase.updateUserPassword("ceva",LoginDialog::FNVHash("altceva"));
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
@@ -214,7 +212,7 @@ MainWindow::MainWindow() : QMainWindow()
 
 void MainWindow::addBorrowBook(Book& book)
 {
-    dataBase->removeBook(book);
+    dataBase->removeAvailableBook(book);
     book.setRemainingDays(14);
     user->addBorrowedBook(book);
 }

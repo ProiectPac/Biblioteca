@@ -21,7 +21,7 @@ public:
     void removeUser(User user);
     QVector<Book> getAvailableBooks();
     void addAvailableBook(Book book);
-    void removeBook(Book book);
+    void removeAvailableBook(Book book);
     static int levenshteinDistance(std::string,std::string);
     QVector<Book> searchBooks(std::string&,std::string&,std::string&);
     ~DataBase();

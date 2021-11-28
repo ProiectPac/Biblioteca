@@ -105,3 +105,13 @@ std::vector<Book> SQLDataBase::getAvailableBooks()
     }
     return availableBooks;
 }
+
+void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordHash)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE users SET passwordHash = ? WHERE name = ?");
+    query.addBindValue(newPasswordHash);
+    query.addBindValue(userName);
+    if(!query.exec())
+        qWarning() << "ERROR: " << query.lastError().text();
+}

@@ -82,7 +82,7 @@ void DataBase::addAvailableBook(Book book)
     availableBooks.push_back(book);
 }
 
-void DataBase::removeBook(Book book)
+void DataBase::removeAvailableBook(Book book)
 {
     for(int i=0;i<availableBooks.size();i++)
         if(book.getISBN()==availableBooks[i].getISBN())

@@ -12,14 +12,15 @@ class SQLDataBase
 {
 private:
     QSqlDatabase dataBase;
-public:
-    void addUser(User user);
+public:    
     SQLDataBase();
+    void addUser(User user);
     User findUser(QString name, unsigned int passwordHash);
     void removeUser(QString name);
     void addBook(Book book);
     void removeBook(QString title);
-    std::vector<Book>getAvailableBooks();
+    std::vector<Book> getAvailableBooks();
+    void updateUserPassword(QString userName, unsigned int newPasswordHash);
 };
 
 #endif // SQLDATABASE_H
