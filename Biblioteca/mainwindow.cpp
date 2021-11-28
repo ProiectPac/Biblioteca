@@ -205,6 +205,7 @@ MainWindow::MainWindow() : QMainWindow()
     User gigi = sqlDataBase.findUser("gigi",1042775456);
 
 
+
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
@@ -215,14 +216,14 @@ MainWindow::MainWindow() : QMainWindow()
 void MainWindow::addBorrowBook(Book& book)
 {
     dataBase->removeBook(book);
-    book.setRemaingDays(14);
+    book.setRemainingDays(14);
     user->addBorrowedBook(book);
 }
 
 void MainWindow::deleteBorrowBook(Book& book)
 {
     user->removeBorrowedBook(book);
-    book.setRemaingDays(-1);
+    book.setRemainingDays(-1);
     dataBase->addAvailableBook(book);
 }
 

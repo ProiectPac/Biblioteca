@@ -30,7 +30,7 @@ DataBase::DataBase()
             int remainingDays;
             fin>>remainingDays;
             fin.get();
-            newUser.addBorrowedBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),remainingDays));
+           // newUser.addBorrowedBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),remainingDays));
         }
         addUser(newUser);
     }
@@ -45,7 +45,7 @@ DataBase::DataBase()
         std::getline(fin,author);
         std::string ISBN;
         std::getline(fin,ISBN);
-        addAvailableBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),-1));
+        //addAvailableBook(Book(QString::fromStdString(title), QString::fromStdString(author), QString::fromStdString(ISBN),-1));
     }
 }
 

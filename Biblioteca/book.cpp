@@ -12,7 +12,7 @@ const QString &Book::getISBN() const
 
 const QString &Book::getName() const
 {
-    return name;
+    return title;
 }
 
 const int &Book::getID() const
@@ -42,26 +42,32 @@ const QString &Book::getImageURL() const
 
 int Book::getRemaingDays() const
 {
-    return remaingDays;
+    return remainingDays;
 }
 
-void Book::setRemaingDays(int newRemaingDays)
+void Book::setRemainingDays(int newRemainingDays)
 {
-    remaingDays = newRemaingDays;
+    remainingDays = newRemainingDays;
 }
 
 Book::Book()
 {
-    name="";
+    title="";
     author="";
     ISBN="";
 }
 
-Book::Book(const QString& name,const QString& author,const QString& ISBN,const int& remaingDays)
+Book::Book(const int &ID, const QString &ISBN, const QString &author, const int &originalPublicationYear, const QString &title, const QString &language, const float &averageRating, const QString &imageURL, const QString &smallImageURL, const int &remainingDays)
 {
-    this->name=name;
-    this->author=author;
-    this->ISBN=ISBN;
-    this->remaingDays = remaingDays;
+    this->ID = ID;
+    this->ISBN = ISBN;
+    this->author = author;
+    this->originalPublicationYear = originalPublicationYear;
+    this->title = title;
+    this->language = language;
+    this->averageRating = averageRating;
+    this->imageURL = imageURL;
+    this->smallImageURL = smallImageURL;
+    this->remainingDays = remainingDays;
 }
 

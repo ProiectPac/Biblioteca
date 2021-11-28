@@ -6,19 +6,20 @@
 class Book
 {
 private:
-    QString name;
+    QString title;
     QString author;
     QString ISBN;
-    int remaingDays;
+    int remainingDays;
     int ID;
     int booksCount;
     int originalPublicationYear;
     QString language;
     float averageRating;
     QString imageURL;
+    QString smallImageURL;
 public:
     Book();
-    Book(const QString& name,const QString& author,const QString& ISBN,const int& remaingDays);
+    Book(const int& ID, const QString& ISBN, const QString& author, const int& originalPublicationYear, const QString& title, const QString& language, const float& averageRating, const QString& imageURL, const QString& smallImageURL,const int& remainingDays);
     const QString &getAuthor() const;
     const QString &getISBN() const;
     const QString &getName() const;
@@ -29,7 +30,7 @@ public:
     const QString &getLanguage() const;
     const QString &getImageURL() const;
     int getRemaingDays() const;
-    void setRemaingDays(int newRemaingDays);
+    void setRemainingDays(int newRemainingDays);
 };
 
 #endif // BOOK_H

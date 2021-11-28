@@ -37,7 +37,7 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
     {
         User foundUser(name,passwordHash);
         QSqlQuery booksQuery;
-        booksQuery.prepare("SELECT title,authors,isbn,remaining_days FROM books WHERE owner = ?");
+        booksQuery.prepare("SELECT ID,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE owner = ?");
         booksQuery.addBindValue(name);
         if(!booksQuery.exec())
           qWarning() << "ERROR: " << booksQuery.lastError().text();
@@ -45,7 +45,7 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
         {
             while(booksQuery.next())
             {
-                foundUser.addBorrowedBook(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt()));
+                foundUser.addBorrowedBook(Book(booksQuery.value(0).toInt(),booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
             }
 
         }
@@ -60,5 +60,5 @@ void SQLDataBase::removeUser(QString name)
     query.prepare("DELETE FROM users WHERE name = ?;");
     query.addBindValue(name);
     if(!query.exec())
-       qWarning() << "ERROR: " << query.lastError().text();
+        qWarning() << "ERROR: " << query.lastError().text();
 }
