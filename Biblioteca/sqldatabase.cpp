@@ -1,21 +1,26 @@
 #include "sqldatabase.h"
 
+void SQLDataBase::addUser(User user)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO users VALUES(?,?)");
+    query.addBindValue(user.getUserName());
+    query.addBindValue(user.getPasswordHash());
+    query.exec();
+    if(!query.exec())
+      qWarning() << "ERROR: " << query.lastError().text();
+}
+
 SQLDataBase::SQLDataBase()
 {
     const QString driver ="QSQLITE";
     if(QSqlDatabase::isDriverAvailable(driver))
     {
-        QSqlDatabase dataBase = QSqlDatabase::addDatabase(driver);
+        dataBase = QSqlDatabase::addDatabase(driver);
         dataBase.setDatabaseName("../dataBase.db");
         if(!dataBase.open())
         {
             qWarning() << "ERROR: " << dataBase.lastError();
-        }
-        else
-        {
-            QSqlQuery query("INSERT INTO users VALUES(\"nae\", 4001284951)");
-            if(!query.isActive())
-                qWarning() << "ERROR: " << query.lastError().text();
         }
     }
 }

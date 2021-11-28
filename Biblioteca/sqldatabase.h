@@ -11,10 +11,9 @@
 class SQLDataBase
 {
 private:
-    QVector<User> userList;
-    QVector<Book> availableBooks;
-    void showError(const QSqlError &err);
+    QSqlDatabase dataBase;
 public:
+    void addUser(User user);
     SQLDataBase();
 };
 

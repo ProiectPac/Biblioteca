@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow
 public:
     ~MainWindow();
 
+
     void setUser(User *newUser);
 
     void setDataBase(const std::shared_ptr<DataBase> &newDataBase);

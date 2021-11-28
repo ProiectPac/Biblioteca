@@ -201,7 +201,6 @@ MainWindow::MainWindow() : QMainWindow()
 {
     setUpUI();
     setUpUserBar();
-
     dataBase = std::shared_ptr<DataBase>(new DataBase());
 
     delete loginDialog;
