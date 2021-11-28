@@ -6,12 +6,14 @@
 #include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QMessageBox>
 
 class SQLDataBase
 {
 private:
     QVector<User> userList;
     QVector<Book> availableBooks;
+    void showError(const QSqlError &err);
 public:
     SQLDataBase();
 };
