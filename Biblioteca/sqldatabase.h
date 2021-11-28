@@ -17,6 +17,7 @@ public:
     SQLDataBase();
     User findUser(QString name, unsigned int passwordHash);
     void removeUser(QString name);
+    void addBook(Book book);
 };
 
 #endif // SQLDATABASE_H

@@ -135,7 +135,7 @@ QVector<Book> DataBase::searchBooks(std::string& name,std::string& author,std::s
         }
         bool operator ()(Book book1, Book book2)
         {
-            int nameDistance = levenshteinDistance(name,book1.getName().toStdString());
+            int nameDistance = levenshteinDistance(name,book1.getTitle().toStdString());
             int authorDistance = levenshteinDistance(author,book1.getAuthor().toStdString());
             int ISBNDistance = levenshteinDistance(ISBN,book1.getISBN().toStdString());
             if(name == "")
@@ -147,7 +147,7 @@ QVector<Book> DataBase::searchBooks(std::string& name,std::string& author,std::s
 
             float meanDistance1 = (nameDistance + authorDistance + ISBNDistance)/3.f;
 
-             nameDistance = levenshteinDistance(name,book2.getName().toStdString());
+             nameDistance = levenshteinDistance(name,book2.getTitle().toStdString());
             authorDistance = levenshteinDistance(author,book2.getAuthor().toStdString());
              ISBNDistance = levenshteinDistance(ISBN,book2.getISBN().toStdString());
             if(name == "")
@@ -178,13 +178,13 @@ DataBase::~DataBase()
         fout<<user.getBorrowedBooks().size()<<'\n';
         for(auto& book : user.getBorrowedBooks())
         {
-            fout<<book.getName().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString() << '\n' << book.getRemaingDays() <<'\n';
+            fout<<book.getTitle().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString() << '\n' << book.getRemainingDays() <<'\n';
         }
 
     }
     fout<<availableBooks.size()<<'\n';
     for(auto& book : availableBooks)
     {
-        fout<<book.getName().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString()<<'\n';
+        fout<<book.getTitle().toStdString()<<'\n'<<book.getAuthor().toStdString()<<'\n'<<book.getISBN().toStdString()<<'\n';
     }
 }
