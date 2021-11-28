@@ -7,7 +7,7 @@ void SQLDataBase::addUser(User user)
     query.addBindValue(user.getUserName());
     query.addBindValue(user.getPasswordHash());
     if(!query.exec())
-      qWarning() << "ERROR: " << query.lastError().text();
+        qWarning() << "ERROR: " << query.lastError().text();
 }
 
 SQLDataBase::SQLDataBase()
@@ -31,28 +31,28 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
     query.addBindValue(name);
     query.addBindValue(passwordHash);
     if(!query.exec())
-      qWarning() << "ERROR: " << query.lastError().text();
+        qWarning() << "ERROR: " << query.lastError().text();
     else
-    if(query.first())
-    {
-        User foundUser(name,passwordHash);
-        QSqlQuery booksQuery;
-        booksQuery.prepare("SELECT isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE owner = ?");
-        booksQuery.addBindValue(name);
-        if(!booksQuery.exec())
-          qWarning() << "ERROR: " << booksQuery.lastError().text();
-        else
+        if(query.first())
         {
-            while(booksQuery.next())
+            User foundUser(name,passwordHash);
+            QSqlQuery booksQuery;
+            booksQuery.prepare("SELECT isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE owner = ?");
+            booksQuery.addBindValue(name);
+            if(!booksQuery.exec())
+                qWarning() << "ERROR: " << booksQuery.lastError().text();
+            else
             {
-                foundUser.addBorrowedBook(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toInt(), booksQuery.value(3).toString(),booksQuery.value(4).toString(),booksQuery.value(5).toFloat(),booksQuery.value(6).toString(),booksQuery.value(7).toString(),booksQuery.value(8).toInt()));
-            }
+                while(booksQuery.next())
+                {
+                    foundUser.addBorrowedBook(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toInt(), booksQuery.value(3).toString(),booksQuery.value(4).toString(),booksQuery.value(5).toFloat(),booksQuery.value(6).toString(),booksQuery.value(7).toString(),booksQuery.value(8).toInt()));
+                }
 
+            }
+            return foundUser;
         }
-        return foundUser;
-    }
-    else
-      return User();
+        else
+            return User();
 }
 void SQLDataBase::removeUser(QString name)
 {
@@ -114,4 +114,27 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
     query.addBindValue(userName);
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
+}
+
+void SQLDataBase::borrowBook(QString userName, QString bookTitle)
+{
+    QSqlQuery findBookIdQuery;
+    findBookIdQuery.prepare("SELECT id FROM books WHERE title = ?");
+    findBookIdQuery.addBindValue(bookTitle);
+
+    if(!findBookIdQuery.exec())
+        qWarning() << "ERROR: " << findBookIdQuery.lastError().text();
+
+    if(!findBookIdQuery.first())
+        qWarning() << "ERROR: " << "Book not found";
+    else
+    {
+        QSqlQuery insertQuery;
+        insertQuery.prepare("INSERT INTO user_book VALUES(?,?)");
+        insertQuery.addBindValue(findBookIdQuery.value(0).toInt());
+        insertQuery.addBindValue(userName);
+
+        if(!insertQuery.exec())
+            qWarning() << "ERROR: " << insertQuery.lastError().text();
+    }
 }

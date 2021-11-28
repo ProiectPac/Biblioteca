@@ -202,7 +202,8 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
-    sqlDataBase.updateUserPassword("ceva",LoginDialog::FNVHash("altceva"));
+    sqlDataBase.borrowBook("gigi","A Game of Thrones (A Song of Ice and Fire, #1)");
+
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
