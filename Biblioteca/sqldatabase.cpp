@@ -138,3 +138,26 @@ void SQLDataBase::borrowBook(QString userName, QString bookTitle)
             qWarning() << "ERROR: " << insertQuery.lastError().text();
     }
 }
+
+void SQLDataBase::returnBook(QString userName, QString bookTitle)
+{
+    QSqlQuery findBookIdQuery;
+    findBookIdQuery.prepare("SELECT id FROM books WHERE title = ?");
+    findBookIdQuery.addBindValue(bookTitle);
+
+    if(!findBookIdQuery.exec())
+        qWarning() << "ERROR: " << findBookIdQuery.lastError().text();
+
+    if(!findBookIdQuery.first())
+        qWarning() << "ERROR: " << "Book not found";
+    else
+    {
+        QSqlQuery deleteQuery;
+        deleteQuery.prepare("DELETE FROM user_book WHERE book_id = ? AND user_name = ?");
+        deleteQuery.addBindValue(findBookIdQuery.value(0).toInt());
+        deleteQuery.addBindValue(userName);
+
+        if(!deleteQuery.exec())
+            qWarning() << "ERROR: " << deleteQuery.lastError().text();
+    }
+}

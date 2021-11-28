@@ -22,6 +22,7 @@ public:
     std::vector<Book> getAvailableBooks();
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
     void borrowBook(QString userName, QString bookTitle);
+    void returnBook(QString userName, QString bookTitle);
 };
 
 #endif // SQLDATABASE_H
