@@ -50,6 +50,71 @@ void Book::setRemainingDays(int newRemainingDays)
     remainingDays = newRemainingDays;
 }
 
+const QString &Book::getTitle() const
+{
+    return title;
+}
+
+void Book::setTitle(const QString &newTitle)
+{
+    title = newTitle;
+}
+
+void Book::setAuthor(const QString &newAuthor)
+{
+    author = newAuthor;
+}
+
+void Book::setISBN(const QString &newISBN)
+{
+    ISBN = newISBN;
+}
+
+int Book::getRemainingDays() const
+{
+    return remainingDays;
+}
+
+void Book::setID(int newID)
+{
+    ID = newID;
+}
+
+void Book::setBooksCount(int newBooksCount)
+{
+    booksCount = newBooksCount;
+}
+
+void Book::setOriginalPublicationYear(int newOriginalPublicationYear)
+{
+    originalPublicationYear = newOriginalPublicationYear;
+}
+
+void Book::setLanguage(const QString &newLanguage)
+{
+    language = newLanguage;
+}
+
+void Book::setAverageRating(float newAverageRating)
+{
+    averageRating = newAverageRating;
+}
+
+void Book::setImageURL(const QString &newImageURL)
+{
+    imageURL = newImageURL;
+}
+
+const QString &Book::getSmallImageURL() const
+{
+    return smallImageURL;
+}
+
+void Book::setSmallImageURL(const QString &newSmallImageURL)
+{
+    smallImageURL = newSmallImageURL;
+}
+
 Book::Book()
 {
     title="";
