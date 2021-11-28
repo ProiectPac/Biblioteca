@@ -203,7 +203,8 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
     User gigi = sqlDataBase.findUser("gigi",1042775456);
-    sqlDataBase.removeBook("Amintirile lui Gigi");
+    //sqlDataBase.removeBook("Amintirile lui Gigi");
+    auto books = sqlDataBase.getAvailableBooks();
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);

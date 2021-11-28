@@ -19,6 +19,7 @@ public:
     void removeUser(QString name);
     void addBook(Book book);
     void removeBook(QString title);
+    std::vector<Book>getAvailableBooks();
 };
 
 #endif // SQLDATABASE_H

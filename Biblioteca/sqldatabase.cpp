@@ -88,3 +88,20 @@ void SQLDataBase::removeBook(QString title)
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
+
+std::vector<Book> SQLDataBase::getAvailableBooks()
+{
+    std::vector<Book>availableBooks;
+    QSqlQuery booksQuery;
+    booksQuery.prepare("SELECT isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE owner IS NULL");
+    if(!booksQuery.exec())
+        qWarning() << "ERROR: " << booksQuery.lastError().text();
+    else
+    {
+        while(booksQuery.next())
+        {
+            availableBooks.push_back(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toInt(), booksQuery.value(3).toString(),booksQuery.value(4).toString(),booksQuery.value(5).toFloat(),booksQuery.value(6).toString(),booksQuery.value(7).toString(),booksQuery.value(8).toInt()));
+        }
+    }
+    return availableBooks;
+}
