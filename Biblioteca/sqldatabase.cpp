@@ -81,9 +81,9 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
     std::vector<Book>availableBooks;
     QSqlQuery booksQuery;
     booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
-    booksQuery.addBindValue(pageNumber*10);
+    booksQuery.addBindValue(pageNumber*45);
     pageNumber++;
-    booksQuery.addBindValue(pageNumber*10);
+    booksQuery.addBindValue(pageNumber*45);
     if(!booksQuery.exec())
         qWarning() << "ERROR: " << booksQuery.lastError().text();
     else
@@ -139,9 +139,9 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
     insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,books.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
     booksQuery.prepare(" SELECT * FROM borrowed_books WHERE ROWID >= ? AND ROWID < ? ;");
     insert.addBindValue(userName);
-    booksQuery.addBindValue(pageNumber*10);
+    booksQuery.addBindValue(pageNumber*45);
     pageNumber++;
-    booksQuery.addBindValue(pageNumber*10);
+    booksQuery.addBindValue(pageNumber*45);
     if(!insert.exec())
         qWarning() << "ERROR: " << insert.lastError().text();
     else

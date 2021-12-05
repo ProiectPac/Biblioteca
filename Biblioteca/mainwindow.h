@@ -11,11 +11,13 @@
 #include <QInputDialog>
 #include <QTextBrowser>
 #include "borderlayout.h"
-#include <QListView>
+#include <QTreeView>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include "treemodel.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,8 +48,10 @@ private:
     LoginDialog* loginDialog = nullptr;
     Ui::MainWindow *ui = nullptr;
     User* user = nullptr;
-    QListView* availableBooksList=nullptr;
-    QListView* borrowedBooksList=nullptr;
+    QTreeView* availableBooksList=nullptr;
+    QTreeView* borrowedBooksList=nullptr;
+    TreeModel* availableBooksModel=nullptr;
+    TreeModel* borrowedBooksModel=nullptr;
 
     bool hasError=false;
 
@@ -63,6 +67,7 @@ private:
     void deleteCurrentUser();
     void changeCurrentUserPassword();
 
-    int currentPage=0;
+    int currentAvailableBooksPage=0;
+    int currentBorrowedBooksPage=0;
 };
 #endif // MAINWINDOW_H

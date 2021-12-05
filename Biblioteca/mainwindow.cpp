@@ -81,6 +81,12 @@ void MainWindow::loginDialogFinished()
                 {
                     auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
                     setUser(foundUser);
+
+                    availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
+                    borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+
+                    availableBooksList->setModel(availableBooksModel);
+                    borrowedBooksList->setModel(borrowedBooksModel);
                 }
                 else
                 {
@@ -100,7 +106,13 @@ void MainWindow::loginDialogFinished()
             {
                 dataBase->addUser(User(userCredentials.first, userCredentials.second));
                 auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
-                setUser(foundUser);
+                setUser(foundUser);                
+
+                availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
+                borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+
+                availableBooksList->setModel(availableBooksModel);
+                borrowedBooksList->setModel(borrowedBooksModel);
             }
         }
     }
@@ -116,8 +128,8 @@ void MainWindow::setUpUI()
     bookContent->setPlainText("Book content");
 
 
-    availableBooksList = new QListView;
-    borrowedBooksList = new QListView;
+    availableBooksList = new QTreeView;
+    borrowedBooksList = new QTreeView;
 
     QGroupBox* availableBookBox = new QGroupBox;
 
@@ -242,11 +254,12 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
-    auto gigi = sqlDataBase.getNextBorrowedBooks(0, "gigi");
+
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-    loginDialog->open();
+    loginDialog->open();    
+
 }
 
 void MainWindow::addBorrowBook(Book& book)
@@ -265,6 +278,8 @@ void MainWindow::deleteBorrowBook(Book& book)
 
 void MainWindow::logOut()
 {
+    currentAvailableBooksPage=0;
+    currentBorrowedBooksPage=0;
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);

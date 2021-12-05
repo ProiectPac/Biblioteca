@@ -17,6 +17,8 @@ SOURCES += \
     mainwindow.cpp \
     sqlite3.c \
     sqldatabase.cpp \
+    treeitem.cpp \
+    treemodel.cpp \
     user.cpp
 
 HEADERS += \
@@ -26,6 +28,8 @@ HEADERS += \
     logindialog.h \
     mainwindow.h \
     sqldatabase.h \
+    treeitem.h \
+    treemodel.h \
     user.h
 
 FORMS += \
