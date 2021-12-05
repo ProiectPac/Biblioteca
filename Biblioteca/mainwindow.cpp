@@ -180,6 +180,25 @@ void MainWindow::setUpUI()
     borrowedBooksLayout->addWidget(borrowedBooksSearchBox);
     borrowedBooksLayout->addWidget(borrowedBooksList);
 
+    QGroupBox* borrowedBooksNavigationBox = new QGroupBox;
+    QHBoxLayout* borrowedBooksNavigation = new QHBoxLayout;
+
+    QPushButton* previousBorrowedBooksButton = new QPushButton;
+    QPushButton* nextBorrowedBooksButton = new QPushButton;
+
+    previousBorrowedBooksButton->setText("Previous");
+    nextBorrowedBooksButton->setText("Next");
+
+    QLineEdit* borrowedCurrentPageLineEdit = new QLineEdit;
+
+    borrowedBooksNavigation->addWidget(previousBorrowedBooksButton);
+    borrowedBooksNavigation->addWidget(borrowedCurrentPageLineEdit);
+    borrowedBooksNavigation->addWidget(nextBorrowedBooksButton);
+
+    borrowedBooksNavigationBox->setLayout(borrowedBooksNavigation);
+
+    borrowedBooksLayout->addWidget(borrowedBooksNavigationBox);
+
     borrowedBookBox->setLayout(borrowedBooksLayout);
 
     layout = new BorderLayout;
