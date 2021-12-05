@@ -126,48 +126,25 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
         qWarning() << "ERROR: " << query.lastError().text();
 }
 
-void SQLDataBase::borrowBook(QString userName, QString bookTitle)
+void SQLDataBase::borrowBook(QString userName, int bookID)
 {
-    QSqlQuery findBookIdQuery;
-    findBookIdQuery.prepare("SELECT id FROM books WHERE title = ?");
-    findBookIdQuery.addBindValue(bookTitle);
+    QSqlQuery insertQuery;
+    insertQuery.prepare("INSERT INTO user_book VALUES(?,?)");
+    insertQuery.addBindValue(bookID);
+    insertQuery.addBindValue(userName);
 
-    if(!findBookIdQuery.exec())
-        qWarning() << "ERROR: " << findBookIdQuery.lastError().text();
-
-    if(!findBookIdQuery.first())
-        qWarning() << "ERROR: " << "Book not found";
-    else
-    {
-        QSqlQuery insertQuery;
-        insertQuery.prepare("INSERT INTO user_book VALUES(?,?)");
-        insertQuery.addBindValue(findBookIdQuery.value(0).toInt());
-        insertQuery.addBindValue(userName);
-
-        if(!insertQuery.exec())
-            qWarning() << "ERROR: " << insertQuery.lastError().text();
-    }
+    if(!insertQuery.exec())
+        qWarning() << "ERROR: " << insertQuery.lastError().text();
 }
 
-void SQLDataBase::returnBook(QString userName, QString bookTitle)
+void SQLDataBase::returnBook(QString userName, int bookID)
 {
-    QSqlQuery findBookIdQuery;
-    findBookIdQuery.prepare("SELECT id FROM books WHERE title = ?");
-    findBookIdQuery.addBindValue(bookTitle);
 
-    if(!findBookIdQuery.exec())
-        qWarning() << "ERROR: " << findBookIdQuery.lastError().text();
+    QSqlQuery deleteQuery;
+    deleteQuery.prepare("DELETE FROM user_book WHERE book_id = ? AND user_name = ?");
+    deleteQuery.addBindValue(bookID);
+    deleteQuery.addBindValue(userName);
 
-    if(!findBookIdQuery.first())
-        qWarning() << "ERROR: " << "Book not found";
-    else
-    {
-        QSqlQuery deleteQuery;
-        deleteQuery.prepare("DELETE FROM user_book WHERE book_id = ? AND user_name = ?");
-        deleteQuery.addBindValue(findBookIdQuery.value(0).toInt());
-        deleteQuery.addBindValue(userName);
-
-        if(!deleteQuery.exec())
-            qWarning() << "ERROR: " << deleteQuery.lastError().text();
-    }
+    if(!deleteQuery.exec())
+        qWarning() << "ERROR: " << deleteQuery.lastError().text();
 }
