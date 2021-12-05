@@ -206,8 +206,6 @@ MainWindow::MainWindow() : QMainWindow()
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
     loginDialog->open();
-    sqlDataBase.getPreviousAvailableBooks(currentPage);
-
 }
 
 void MainWindow::addBorrowBook(Book& book)
