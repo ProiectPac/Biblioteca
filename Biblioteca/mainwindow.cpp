@@ -138,6 +138,27 @@ void MainWindow::setUpUI()
     availableBooksLayout->addWidget(availableBooksSearchBox);
     availableBooksLayout->addWidget(availableBooksList);
 
+    QGroupBox* availableBooksNavigationBox = new QGroupBox;
+    QHBoxLayout* availableBooksNavigation = new QHBoxLayout;
+
+    QPushButton* previousAvailableBooksButton = new QPushButton;
+    QPushButton* nextAvailableBooksButton = new QPushButton;
+
+    previousAvailableBooksButton->setText("Previous");
+    nextAvailableBooksButton->setText("Next");
+
+    QLineEdit* currentPageLineEdit = new QLineEdit;
+
+    availableBooksNavigation->addWidget(previousAvailableBooksButton);
+    availableBooksNavigation->addWidget(currentPageLineEdit);
+    availableBooksNavigation->addWidget(nextAvailableBooksButton);
+
+    availableBooksNavigationBox->setLayout(availableBooksNavigation);
+
+    availableBooksLayout->addWidget(availableBooksNavigationBox);
+
+
+
     availableBookBox->setLayout(availableBooksLayout);
 
     QGroupBox* borrowedBookBox = new QGroupBox;

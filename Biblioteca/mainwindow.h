@@ -15,6 +15,7 @@
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QFormLayout>
+#include <QHBoxLayout>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
