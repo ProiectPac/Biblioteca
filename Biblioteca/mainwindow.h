@@ -61,5 +61,7 @@ private:
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
+
+    int currentPage=0;
 };
 #endif // MAINWINDOW_H

@@ -19,7 +19,7 @@ public:
     void removeUser(QString name);
     void addBook(Book book);
     void removeBook(QString title);
-    std::vector<Book> getAvailableBooks();
+    std::vector<Book> getNextAvailableBooks(int& pageNumber);
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
     void borrowBook(QString userName, QString bookTitle);
     void returnBook(QString userName, QString bookTitle);

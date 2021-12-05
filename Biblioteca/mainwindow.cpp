@@ -202,12 +202,11 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
-    sqlDataBase.returnBook("gigi","A Game of Thrones (A Song of Ice and Fire, #1)");
-
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
     loginDialog->open();
+    sqlDataBase.getPreviousAvailableBooks(currentPage);
 
 }
 
