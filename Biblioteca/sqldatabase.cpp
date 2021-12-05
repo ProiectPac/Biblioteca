@@ -67,16 +67,16 @@ void SQLDataBase::addBook(Book book)
         qWarning() << "ERROR: " << query.lastError().text();
 }
 
-void SQLDataBase::removeBook(QString title)
+void SQLDataBase::removeBook(int bookId)
 {
     QSqlQuery query;
-    query.prepare("DELETE FROM books WHERE title = ?;");
-    query.addBindValue(title);
+    query.prepare("DELETE FROM books WHERE id = ?;");
+    query.addBindValue(bookId);
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
 
-std::vector<Book> SQLDataBase::getNextAvailableBooks(int pageNumber)
+std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
 {
     std::vector<Book>availableBooks;
     QSqlQuery booksQuery;
@@ -129,7 +129,7 @@ void SQLDataBase::returnBook(QString userName, int bookID)
         qWarning() << "ERROR: " << deleteQuery.lastError().text();
 }
 
-std::vector<Book> SQLDataBase::getNextBorrowedBooks(int pageNumber, QString userName)
+std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName)
 {
     std::vector<Book>previousBooks;
     QSqlQuery booksQuery;

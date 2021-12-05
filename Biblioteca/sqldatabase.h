@@ -18,14 +18,12 @@ public:
     User findUser(QString name, unsigned int passwordHash);
     void removeUser(QString name);
     void addBook(Book book);
-    void removeBook(QString title);
-    std::vector<Book> getPreviousAvailableBooks(int pageNumber);
-    std::vector<Book> getNextAvailableBooks(int pageNumber);
+    void removeBook(int bookId);
+    std::vector<Book> getAvailableBooks(int pageNumber);
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
     void borrowBook(QString userName, int bookId);
     void returnBook(QString userName, int bookId);
-    std::vector<Book> getPreviousBorrowedBooks(int pageNumber, QString userName);
-    std::vector<Book> getNextBorrowedBooks(int pageNumber, QString userName);
+    std::vector<Book> getBorrowedBooks(int pageNumber, QString userName);
 
 };
 
