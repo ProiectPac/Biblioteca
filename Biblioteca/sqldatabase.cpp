@@ -80,7 +80,7 @@ std::vector<Book> SQLDataBase::getPreviousAvailableBooks(int pageNumber)
 {
     std::vector<Book>previousBooks;
     QSqlQuery booksQuery;
-    booksQuery.prepare("SELECT isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID < ? AND ROWID >= ?");
+    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID < ? AND ROWID >= ?");
     booksQuery.addBindValue(pageNumber*10);
     pageNumber--;
     booksQuery.addBindValue(pageNumber*10);
@@ -90,7 +90,7 @@ std::vector<Book> SQLDataBase::getPreviousAvailableBooks(int pageNumber)
     {
         while(booksQuery.next())
         {
-            previousBooks.push_back(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toInt(), booksQuery.value(3).toString(),booksQuery.value(4).toString(),booksQuery.value(5).toFloat(),booksQuery.value(6).toString(),booksQuery.value(7).toString(),booksQuery.value(8).toInt()));
+            previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
         }
     }
     return previousBooks;
@@ -100,7 +100,7 @@ std::vector<Book> SQLDataBase::getNextAvailableBooks(int pageNumber)
 {
     std::vector<Book>availableBooks;
     QSqlQuery booksQuery;
-    booksQuery.prepare("SELECT isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
+    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
     booksQuery.addBindValue(pageNumber*10);
     pageNumber++;
     booksQuery.addBindValue(pageNumber*10);
@@ -110,7 +110,7 @@ std::vector<Book> SQLDataBase::getNextAvailableBooks(int pageNumber)
     {
         while(booksQuery.next())
         {
-            availableBooks.push_back(Book(booksQuery.value(0).toString(),booksQuery.value(1).toString(),booksQuery.value(2).toInt(), booksQuery.value(3).toString(),booksQuery.value(4).toString(),booksQuery.value(5).toFloat(),booksQuery.value(6).toString(),booksQuery.value(7).toString(),booksQuery.value(8).toInt()));
+            availableBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
         }
     }
     return availableBooks;
