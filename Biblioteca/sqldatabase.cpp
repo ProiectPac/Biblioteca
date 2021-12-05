@@ -179,3 +179,34 @@ std::vector<Book> SQLDataBase::getPreviousBorrowedBooks(int pageNumber, QString 
     }
     return previousBooks;
 }
+
+std::vector<Book> SQLDataBase::getNextBorrowedBooks(int pageNumber, QString userName)
+{
+    std::vector<Book>previousBooks;
+    QSqlQuery booksQuery;
+    QSqlQuery createTable("CREATE TABLE borrowed_books (id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days, PRIMARY KEY(id));");
+    QSqlQuery insert;
+
+    insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,books.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
+    booksQuery.prepare(" SELECT * FROM borrowed_books WHERE ROWID >= ? AND ROWID < ? ;");
+    insert.addBindValue(userName);
+    booksQuery.addBindValue(pageNumber*10);
+    pageNumber++;
+    booksQuery.addBindValue(pageNumber*10);
+    if(!insert.exec())
+        qWarning() << "ERROR: " << insert.lastError().text();
+    else
+    {
+    if(!booksQuery.exec())
+        qWarning() << "ERROR: " << booksQuery.lastError().text();
+    else
+    {
+        while(booksQuery.next())
+        {
+            previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
+        }
+    }
+    QSqlQuery drop("DROP TABLE borrowed_books");
+    }
+    return previousBooks;
+}
