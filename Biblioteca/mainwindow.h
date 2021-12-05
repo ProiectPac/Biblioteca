@@ -66,6 +66,10 @@ private:
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
+    void nextAvailableBooksButtonOnClick();
+    void previousAvailableBooksButtonOnClick();
+    void nextBorrowedBooksButtonOnClick();
+    void previousBorrowedBooksButtonOnClick();
 
     int currentAvailableBooksPage=0;
     int currentBorrowedBooksPage=0;
