@@ -242,6 +242,7 @@ MainWindow::MainWindow() : QMainWindow()
     setUpUI();
     setUpUserBar();
     dataBase = std::shared_ptr<DataBase>(new DataBase());
+    auto gigi = sqlDataBase.getPreviousBorrowedBooks(1, "gigi");
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);

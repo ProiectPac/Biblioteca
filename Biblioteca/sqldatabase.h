@@ -24,6 +24,8 @@ public:
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
     void borrowBook(QString userName, int bookId);
     void returnBook(QString userName, int bookId);
+    std::vector<Book> getPreviousBorrowedBooks(int pageNumber, QString userName);
+
 };
 
 #endif // SQLDATABASE_H
