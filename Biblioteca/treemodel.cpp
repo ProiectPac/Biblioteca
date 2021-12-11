@@ -113,6 +113,14 @@ void TreeModel::setUpModel(std::vector<Book> bookVector)
         averageRatingData << "Average rating: " + QString::number(book.getAverageRating());
         TreeItem* averageRating = new TreeItem(averageRatingData,child);
 
+        if(type==false)
+        {
+            QList<QVariant> booksCountData;
+            booksCountData << "Books Count: " + QString::number(book.getBooksCount());
+            TreeItem* booksCount = new TreeItem(booksCountData,child);
+            child->appendChild(booksCount);
+        }
+
         if(type == true)
         {
             QList<QVariant> remainingDaysData;

@@ -251,7 +251,6 @@ MainWindow::MainWindow() : QMainWindow()
 {
     setUpUI();
     setUpUserBar();
-
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);

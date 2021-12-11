@@ -40,6 +40,7 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
         }
         else
             return User();
+    return User();
 }
 void SQLDataBase::removeUser(QString name)
 {
@@ -79,7 +80,7 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
 {
     std::vector<Book>availableBooks;
     QSqlQuery booksQuery;
-    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
+    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count FROM books WHERE books_count>0 AND ROWID >= ? AND ROWID < ?");
     booksQuery.addBindValue(pageNumber*45);
     pageNumber++;
     booksQuery.addBindValue(pageNumber*45);
@@ -89,7 +90,7 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
     {
         while(booksQuery.next())
         {
-            availableBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString()));
+            availableBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
         }
     }
     return availableBooks;
@@ -107,13 +108,13 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
 
 void SQLDataBase::borrowBook(QString userName, int bookID)
 {
-    if(getBorrowedBooks(1,userName).size()>5)
+    if(getBorrowedBooks(0,userName).size()>5)
     {
         QString message= "You have too many borrowed books!";
         QErrorMessage::qtHandler()->showMessage(message);
         return;
     }
-    for(auto&book:getBorrowedBooks(1,userName))
+    for(auto&book:getBorrowedBooks(0,userName))
     {
         if(book.getRemainingDays()==0)
         {
@@ -128,13 +129,36 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
             return;
         }
     }
+    int booksCount=0;
+    QSqlQuery booksCountQuery;
+    booksCountQuery.prepare("SELECT books_count FROM books WHERE id=?");
+    booksCountQuery.addBindValue(bookID);
+    if(!booksCountQuery.exec())
+    {
+        qWarning() << "ERROR: " << booksCountQuery.lastError().text();
+    }
+    if(booksCountQuery.first())
+    {
+        booksCount=booksCountQuery.value(0).toInt();
+    if(booksCountQuery.value(0)==0)
+    {
+        QString message= "There are no books left to borrow!";
+        QErrorMessage::qtHandler()->showMessage(message);
+        return;
+    }
+    }
     QSqlQuery insertQuery;
-    insertQuery.prepare("INSERT INTO user_book VALUES(?,?)");
+    insertQuery.prepare("INSERT INTO user_book VALUES(?,?,14)");
     insertQuery.addBindValue(bookID);
     insertQuery.addBindValue(userName);
-
     if(!insertQuery.exec())
         qWarning() << "ERROR: " << insertQuery.lastError().text();
+    QSqlQuery updateQuery;
+    updateQuery.prepare("UPDATE books SET books_count=? WHERE id=?");
+    updateQuery.addBindValue(booksCount-1);
+    updateQuery.addBindValue(bookID);
+    if(!updateQuery.exec())
+        qWarning() << "ERROR: " << updateQuery.lastError().text();
 }
 
 void SQLDataBase::returnBook(QString userName, int bookID)
@@ -172,7 +196,7 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
     {
         while(booksQuery.next())
         {
-            previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
+            previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),0,booksQuery.value(9).toInt()));
         }
     }
     QSqlQuery drop("DROP TABLE borrowed_books");

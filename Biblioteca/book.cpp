@@ -117,7 +117,7 @@ Book::Book()
     ISBN="";
 }
 
-Book::Book(const int& ID, const QString &ISBN, const QString &author, const int &originalPublicationYear, const QString &title, const QString &language, const float &averageRating, const QString &imageURL, const QString &smallImageURL, const int &remainingDays)
+Book::Book(const int& ID, const QString &ISBN, const QString &author, const int &originalPublicationYear, const QString &title, const QString &language, const float &averageRating, const QString &imageURL, const QString &smallImageURL,const int&booksCount, const int &remainingDays)
 {
     this->ID = ID;
     this->ISBN = ISBN;
@@ -129,6 +129,7 @@ Book::Book(const int& ID, const QString &ISBN, const QString &author, const int 
     this->imageURL = imageURL;
     this->smallImageURL = smallImageURL;
     this->remainingDays = remainingDays;
+    this->booksCount=booksCount;
 
 }
 
