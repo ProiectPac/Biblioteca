@@ -53,7 +53,7 @@ void SQLDataBase::removeUser(QString name)
 void SQLDataBase::addBook(Book book)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) VALUES(?,?,?,?,?,?,?,?,?)");
+    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url) VALUES(?,?,?,?,?,?,?,?)");
     query.addBindValue(book.getISBN());
     query.addBindValue(book.getAuthor());
     query.addBindValue(book.getOriginalPublicationYear());
@@ -62,7 +62,6 @@ void SQLDataBase::addBook(Book book)
     query.addBindValue(book.getAverageRating());
     query.addBindValue(book.getImageURL());
     query.addBindValue(book.getSmallImageURL());
-    query.addBindValue(book.getRemainingDays());
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
@@ -80,7 +79,7 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
 {
     std::vector<Book>availableBooks;
     QSqlQuery booksQuery;
-    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
+    booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url FROM books WHERE NOT EXISTS  (SELECT book_id FROM user_book WHERE books.id = user_book.book_id) AND ROWID >= ? AND ROWID < ?");
     booksQuery.addBindValue(pageNumber*45);
     pageNumber++;
     booksQuery.addBindValue(pageNumber*45);
@@ -90,7 +89,7 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
     {
         while(booksQuery.next())
         {
-            availableBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),booksQuery.value(9).toInt()));
+            availableBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString()));
         }
     }
     return availableBooks;
@@ -136,7 +135,7 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
     QSqlQuery createTable("CREATE TABLE borrowed_books (id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days, PRIMARY KEY(id));");
     QSqlQuery insert;
 
-    insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,books.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
+    insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,user_book.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
     booksQuery.prepare(" SELECT * FROM borrowed_books WHERE ROWID >= ? AND ROWID < ? ;");
     insert.addBindValue(userName);
     booksQuery.addBindValue(pageNumber*45);
