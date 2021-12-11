@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <database.h>
-
 void MainWindow::setUpUserBar()
 {
     userBar = new QMenuBar(this);
@@ -77,13 +75,13 @@ void MainWindow::loginDialogFinished()
         {
             if(loginDialog->getAction()==LoginDialog::Actions::Login)
             {
-                if(dataBase->findUser(userCredentials.first,userCredentials.second)!=nullptr)
+                auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
+                if(foundUser.getUserName()!="")
                 {
-                    auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
                     setUser(foundUser);
 
-                    availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
-                    borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+                    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
+                    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
 
                     availableBooksList->setModel(availableBooksModel);
                     borrowedBooksList->setModel(borrowedBooksModel);
@@ -104,12 +102,12 @@ void MainWindow::loginDialogFinished()
             }
             else if(loginDialog->getAction()==LoginDialog::Actions::Register)
             {
-                dataBase->addUser(User(userCredentials.first, userCredentials.second));
-                auto foundUser = dataBase->findUser(userCredentials.first, userCredentials.second);
+                dataBase.addUser(User(userCredentials.first, userCredentials.second));
+                auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
                 setUser(foundUser);                
 
-                availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
-                borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+                availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
+                borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
 
                 availableBooksList->setModel(availableBooksModel);
                 borrowedBooksList->setModel(borrowedBooksModel);
@@ -230,11 +228,6 @@ void MainWindow::setUpUI()
     setCentralWidget(window);
 }
 
-const std::shared_ptr<DataBase> MainWindow::getDataBase() const
-{
-    return dataBase;
-}
-
 
 MainWindow::~MainWindow()
 { 
@@ -250,7 +243,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setUser( User *newUser)
+void MainWindow::setUser(User newUser)
 {
     user = newUser;
 }
@@ -259,7 +252,6 @@ MainWindow::MainWindow() : QMainWindow()
 {
     setUpUI();
     setUpUserBar();
-    dataBase = std::shared_ptr<DataBase>(new DataBase());
 
     delete loginDialog;
     loginDialog = new LoginDialog(this);
@@ -270,16 +262,12 @@ MainWindow::MainWindow() : QMainWindow()
 
 void MainWindow::addBorrowBook(Book& book)
 {
-    dataBase->removeAvailableBook(book);
-    book.setRemainingDays(14);
-    user->addBorrowedBook(book);
+
 }
 
 void MainWindow::deleteBorrowBook(Book& book)
 {
-    user->removeBorrowedBook(book);
-    book.setRemainingDays(-1);
-    dataBase->addAvailableBook(book);
+
 }
 
 void MainWindow::logOut()
@@ -294,7 +282,7 @@ void MainWindow::logOut()
 
 void MainWindow::deleteCurrentUser()
 {
-    dataBase->removeUser(*user);
+    dataBase.removeUser(user.getUserName());
     logOut();
 }
 
@@ -326,7 +314,7 @@ void MainWindow::changeCurrentUserPassword()
         }
         else
         {
-            user->setPasswordHash(LoginDialog::FNVHash(newPassword));
+            user.setPasswordHash(LoginDialog::FNVHash(newPassword));
         }
     }
     delete passwordDialog;
@@ -338,7 +326,7 @@ void MainWindow::nextAvailableBooksButtonOnClick()
     currentAvailableBooksPage++;
     delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
+    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
@@ -347,7 +335,7 @@ void MainWindow::previousAvailableBooksButtonOnClick()
     currentAvailableBooksPage--;
     delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(sqlDataBase.getAvailableBooks(currentAvailableBooksPage),false);
+    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
@@ -356,7 +344,7 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
     currentBorrowedBooksPage++;
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
@@ -365,7 +353,7 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
     currentBorrowedBooksPage--;
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(sqlDataBase.getBorrowedBooks(currentBorrowedBooksPage,user->getUserName()),true);
+    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 

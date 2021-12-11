@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QErrorMessage>
 #include "logindialog.h"
-#include "database.h"
 #include <memory>
 
 int main(int argc, char *argv[])

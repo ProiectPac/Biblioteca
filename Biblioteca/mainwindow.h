@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "user.h"
-#include "database.h"
 #include "logindialog.h"
 #include <QErrorMessage>
 #include <memory>
@@ -31,12 +30,8 @@ public:
     ~MainWindow();
 
 
-    void setUser(User *newUser);
 
-    void setDataBase(const std::shared_ptr<DataBase> &newDataBase);
     MainWindow();
-
-    const std::shared_ptr<DataBase> getDataBase() const;
 
 private:
     QMenuBar* userBar = nullptr;
@@ -47,7 +42,6 @@ private:
     BorderLayout *layout = nullptr;
     LoginDialog* loginDialog = nullptr;
     Ui::MainWindow *ui = nullptr;
-    User* user = nullptr;
     QTreeView* availableBooksList=nullptr;
     QTreeView* borrowedBooksList=nullptr;
     TreeModel* availableBooksModel=nullptr;
@@ -55,9 +49,10 @@ private:
 
     bool hasError=false;
 
-    SQLDataBase sqlDataBase;
-    std::shared_ptr<DataBase> dataBase;
+    User user;
+    SQLDataBase dataBase;
 
+    void setUser(User newUser);
     void setUpUserBar();
     void loginDialogFinished();
     void setUpUI();

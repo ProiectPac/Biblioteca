@@ -11,11 +11,9 @@ CONFIG += c++11
 SOURCES += \
     book.cpp \
     borderlayout.cpp \
-    database.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    sqlite3.c \
     sqldatabase.cpp \
     treeitem.cpp \
     treemodel.cpp \
@@ -24,7 +22,6 @@ SOURCES += \
 HEADERS += \
     book.h \
     borderlayout.h \
-    database.h \
     logindialog.h \
     mainwindow.h \
     sqldatabase.h \
@@ -40,5 +37,4 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    dataBase.txt
+DISTFILES +=
