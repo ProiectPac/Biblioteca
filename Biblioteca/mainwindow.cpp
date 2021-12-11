@@ -81,7 +81,7 @@ void MainWindow::loginDialogFinished()
                     setUser(foundUser);
 
                     availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
-                    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
+                    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,currentUser.getUserName()),true);
 
                     availableBooksList->setModel(availableBooksModel);
                     borrowedBooksList->setModel(borrowedBooksModel);
@@ -107,7 +107,7 @@ void MainWindow::loginDialogFinished()
                 setUser(foundUser);                
 
                 availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
-                borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
+                borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,currentUser.getUserName()),true);
 
                 availableBooksList->setModel(availableBooksModel);
                 borrowedBooksList->setModel(borrowedBooksModel);
@@ -245,7 +245,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::setUser(User newUser)
 {
-    user = newUser;
+    currentUser = newUser;
 }
 
 MainWindow::MainWindow() : QMainWindow()
@@ -260,14 +260,14 @@ MainWindow::MainWindow() : QMainWindow()
 
 }
 
-void MainWindow::addBorrowBook(Book& book)
+void MainWindow::borrowBook(int bookID)
 {
-
+    dataBase.borrowBook(currentUser.getUserName(), bookID);
 }
 
-void MainWindow::deleteBorrowBook(Book& book)
+void MainWindow::returnBook(int bookID)
 {
-
+    dataBase.returnBook(currentUser.getUserName(), bookID);
 }
 
 void MainWindow::logOut()
@@ -282,7 +282,7 @@ void MainWindow::logOut()
 
 void MainWindow::deleteCurrentUser()
 {
-    dataBase.removeUser(user.getUserName());
+    dataBase.removeUser(currentUser.getUserName());
     logOut();
 }
 
@@ -314,7 +314,8 @@ void MainWindow::changeCurrentUserPassword()
         }
         else
         {
-            user.setPasswordHash(LoginDialog::FNVHash(newPassword));
+            currentUser.setPasswordHash(LoginDialog::FNVHash(newPassword));
+            dataBase.updateUserPassword(currentUser.getUserName(), currentUser.getPasswordHash());
         }
     }
     delete passwordDialog;
@@ -344,7 +345,7 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
     currentBorrowedBooksPage++;
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
+    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,currentUser.getUserName()),true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
@@ -353,7 +354,7 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
     currentBorrowedBooksPage--;
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,user.getUserName()),true);
+    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,currentUser.getUserName()),true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 

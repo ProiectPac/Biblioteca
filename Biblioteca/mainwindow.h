@@ -49,15 +49,15 @@ private:
 
     bool hasError=false;
 
-    User user;
+    User currentUser;
     SQLDataBase dataBase;
 
     void setUser(User newUser);
     void setUpUserBar();
     void loginDialogFinished();
     void setUpUI();
-    void addBorrowBook(Book& book);
-    void deleteBorrowBook(Book& book);
+    void borrowBook(int bookID);
+    void returnBook(int bookID);
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
