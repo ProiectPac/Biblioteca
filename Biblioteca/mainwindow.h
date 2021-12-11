@@ -41,7 +41,6 @@ private:
     QTextBrowser *bookContent = nullptr;
     BorderLayout *layout = nullptr;
     LoginDialog* loginDialog = nullptr;
-    Ui::MainWindow *ui = nullptr;
     QTreeView* availableBooksList=nullptr;
     QTreeView* borrowedBooksList=nullptr;
     TreeModel* availableBooksModel=nullptr;

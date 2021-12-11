@@ -11,7 +11,7 @@ class User
 private:
     QString userName;
     unsigned int passwordHash;
-    QVector<Book>borrowedBooks;
+
 public:
     User();
     ~User();

@@ -30,11 +30,6 @@ public:
 public slots:
     void open() override;
 private:
-    QPushButton *loginButton = nullptr;
-    QPushButton *registerButton = nullptr;
-    QLabel *nameLabel = nullptr;
-    QLabel *passwordLabel = nullptr;
-    QGridLayout *gridLayout = nullptr;
     QLineEdit *nameLineEdit = nullptr;
     QLineEdit *passwordLineEdit = nullptr;
 private slots:

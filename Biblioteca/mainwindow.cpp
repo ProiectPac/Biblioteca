@@ -5,18 +5,18 @@ void MainWindow::setUpUserBar()
 {
     userBar = new QMenuBar(this);
     this->setMenuBar(userBar);
-    userMenu = new QMenu();
+    userMenu = new QMenu(this);
     userMenu->setTitle("User");
-    logOutAction = new QAction();
+    logOutAction = new QAction(this);
     logOutAction->setText("Log out");
     connect(logOutAction,&QAction::triggered,this,&MainWindow::logOut);
     userMenu->addAction(logOutAction);
     userBar->addMenu(userMenu);
-    deleteUserAction = new QAction();
+    deleteUserAction = new QAction(this);
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
-    QAction* changeUserPasswordAction = new QAction();
+    QAction* changeUserPasswordAction = new QAction(this);
     changeUserPasswordAction->setText("Change Password User");
     connect(changeUserPasswordAction,&QAction::triggered,this,&MainWindow::changeCurrentUserPassword);
     userMenu->addAction(changeUserPasswordAction);
@@ -122,22 +122,22 @@ void MainWindow::setUpUI()
 {
     resize(1920, 1080);
 
-    bookContent = new QTextBrowser;
+    bookContent = new QTextBrowser(this);
     bookContent->setPlainText("Book content");
 
 
-    availableBooksList = new QTreeView;
-    borrowedBooksList = new QTreeView;
+    availableBooksList = new QTreeView(this);
+    borrowedBooksList = new QTreeView(this);
 
-    QGroupBox* availableBookBox = new QGroupBox;
+    QGroupBox* availableBookBox = new QGroupBox(this);
 
-    QGroupBox* availableBooksSearchBox = new QGroupBox;
-    QVBoxLayout* availableBooksLayout = new QVBoxLayout;
+    QGroupBox* availableBooksSearchBox = new QGroupBox(this);
+    QVBoxLayout* availableBooksLayout = new QVBoxLayout();
 
-    QFormLayout* availableBooksSearch = new QFormLayout;
-    QLineEdit* availabeleBooksNameLineEdit = new QLineEdit;
-    QLineEdit* availabeleBooksAuthorLineEdit = new QLineEdit;
-    QLineEdit* availabeleBooksISBNLineEdit = new QLineEdit;
+    QFormLayout* availableBooksSearch = new QFormLayout();
+    QLineEdit* availabeleBooksNameLineEdit = new QLineEdit(this);
+    QLineEdit* availabeleBooksAuthorLineEdit = new QLineEdit(this);
+    QLineEdit* availabeleBooksISBNLineEdit = new QLineEdit(this);
 
     availableBooksSearch->addRow("Name:",availabeleBooksNameLineEdit);
     availableBooksSearch->addRow("Author:",availabeleBooksAuthorLineEdit);
@@ -148,11 +148,11 @@ void MainWindow::setUpUI()
     availableBooksLayout->addWidget(availableBooksSearchBox);
     availableBooksLayout->addWidget(availableBooksList);
 
-    QGroupBox* availableBooksNavigationBox = new QGroupBox;
-    QHBoxLayout* availableBooksNavigation = new QHBoxLayout;
+    QGroupBox* availableBooksNavigationBox = new QGroupBox(this);
+    QHBoxLayout* availableBooksNavigation = new QHBoxLayout();
 
-    QPushButton* previousAvailableBooksButton = new QPushButton;
-    QPushButton* nextAvailableBooksButton = new QPushButton;
+    QPushButton* previousAvailableBooksButton = new QPushButton(this);
+    QPushButton* nextAvailableBooksButton = new QPushButton(this);
 
     previousAvailableBooksButton->setText("Previous");
     nextAvailableBooksButton->setText("Next");
@@ -160,7 +160,7 @@ void MainWindow::setUpUI()
     connect(previousAvailableBooksButton,&QPushButton::clicked,this,&MainWindow::previousAvailableBooksButtonOnClick);
     connect(nextAvailableBooksButton,&QPushButton::clicked,this,&MainWindow::nextAvailableBooksButtonOnClick);
 
-    QLineEdit* currentPageLineEdit = new QLineEdit;
+    QLineEdit* currentPageLineEdit = new QLineEdit(this);
 
     availableBooksNavigation->addWidget(previousAvailableBooksButton);
     availableBooksNavigation->addWidget(currentPageLineEdit);
@@ -174,15 +174,15 @@ void MainWindow::setUpUI()
 
     availableBookBox->setLayout(availableBooksLayout);
 
-    QGroupBox* borrowedBookBox = new QGroupBox;
+    QGroupBox* borrowedBookBox = new QGroupBox(this);
 
-    QGroupBox* borrowedBooksSearchBox = new QGroupBox;
-    QVBoxLayout* borrowedBooksLayout = new QVBoxLayout;
+    QGroupBox* borrowedBooksSearchBox = new QGroupBox(this);
+    QVBoxLayout* borrowedBooksLayout = new QVBoxLayout();
 
-    QFormLayout* borrowedBooksSearch = new QFormLayout;
-    QLineEdit* borrowedBooksNameLineEdit = new QLineEdit;
-    QLineEdit* borrowedBooksAuthorLineEdit = new QLineEdit;
-    QLineEdit* borrowedBooksISBNLineEdit = new QLineEdit;
+    QFormLayout* borrowedBooksSearch = new QFormLayout();
+    QLineEdit* borrowedBooksNameLineEdit = new QLineEdit(this);
+    QLineEdit* borrowedBooksAuthorLineEdit = new QLineEdit(this);
+    QLineEdit* borrowedBooksISBNLineEdit = new QLineEdit(this);
 
     borrowedBooksSearch->addRow("Name:",borrowedBooksNameLineEdit);
     borrowedBooksSearch->addRow("Author:",borrowedBooksAuthorLineEdit);
@@ -193,11 +193,11 @@ void MainWindow::setUpUI()
     borrowedBooksLayout->addWidget(borrowedBooksSearchBox);
     borrowedBooksLayout->addWidget(borrowedBooksList);
 
-    QGroupBox* borrowedBooksNavigationBox = new QGroupBox;
-    QHBoxLayout* borrowedBooksNavigation = new QHBoxLayout;
+    QGroupBox* borrowedBooksNavigationBox = new QGroupBox(this);
+    QHBoxLayout* borrowedBooksNavigation = new QHBoxLayout();
 
-    QPushButton* previousBorrowedBooksButton = new QPushButton;
-    QPushButton* nextBorrowedBooksButton = new QPushButton;
+    QPushButton* previousBorrowedBooksButton = new QPushButton(this);
+    QPushButton* nextBorrowedBooksButton = new QPushButton(this);
 
     previousBorrowedBooksButton->setText("Previous");
     nextBorrowedBooksButton->setText("Next");
@@ -205,7 +205,7 @@ void MainWindow::setUpUI()
     connect(previousBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::previousBorrowedBooksButtonOnClick);
     connect(nextBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::nextBorrowedBooksButtonOnClick);
 
-    QLineEdit* borrowedCurrentPageLineEdit = new QLineEdit;
+    QLineEdit* borrowedCurrentPageLineEdit = new QLineEdit(this);
 
     borrowedBooksNavigation->addWidget(previousBorrowedBooksButton);
     borrowedBooksNavigation->addWidget(borrowedCurrentPageLineEdit);
@@ -217,7 +217,7 @@ void MainWindow::setUpUI()
 
     borrowedBookBox->setLayout(borrowedBooksLayout);
 
-    layout = new BorderLayout;
+    layout = new BorderLayout();
     layout->addWidget(bookContent, BorderLayout::Center);
     layout->addWidget(availableBookBox, BorderLayout::West);
     layout->addWidget(borrowedBookBox, BorderLayout::East);
@@ -230,17 +230,16 @@ void MainWindow::setUpUI()
 
 
 MainWindow::~MainWindow()
-{ 
+{
+    delete loginDialog;
     delete userBar;
     delete userMenu;
     delete logOutAction;
     delete deleteUserAction;
-    delete loginDialog;
     delete bookContent;
     delete availableBooksList;
     delete borrowedBooksList;
     delete layout;
-    delete ui;
 }
 
 void MainWindow::setUser(User newUser)
