@@ -107,6 +107,27 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
 
 void SQLDataBase::borrowBook(QString userName, int bookID)
 {
+    if(getBorrowedBooks(1,userName).size()>5)
+    {
+        QString message= "You have too many borrowed books!";
+        QErrorMessage::qtHandler()->showMessage(message);
+        return;
+    }
+    for(auto&book:getBorrowedBooks(1,userName))
+    {
+        if(book.getRemainingDays()==0)
+        {
+            QString message= "You have to return the borrowed book that's past the return limit!";
+            QErrorMessage::qtHandler()->showMessage(message);
+            return;
+        }
+        if(book.getID()==bookID)
+        {
+            QString message= "You cannot borrow the same book twice!";
+            QErrorMessage::qtHandler()->showMessage(message);
+            return;
+        }
+    }
     QSqlQuery insertQuery;
     insertQuery.prepare("INSERT INTO user_book VALUES(?,?)");
     insertQuery.addBindValue(bookID);
