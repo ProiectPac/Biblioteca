@@ -138,6 +138,8 @@ void MainWindow::setUpUI()
     borrowedBooksList = new QTreeView(this);
 
     connect(availableBooksList,&QAbstractItemView::doubleClicked,this,&MainWindow::borrowBook);
+    connect(borrowedBooksList,&QAbstractItemView::doubleClicked,this,&MainWindow::returnBook);
+
 
     QGroupBox* availableBookBox = new QGroupBox(this);
 
@@ -291,8 +293,24 @@ void MainWindow::borrowBook(const QModelIndex &index)
 
 void MainWindow::returnBook(const QModelIndex &index)
 {
+    auto idNode = ((TreeItem *)index.internalPointer())->child(0);
+    if(idNode!=nullptr)
+    {
+        auto string = idNode->data(0).toString();
+        string.erase(string.begin(),string.begin()+4);
 
+        dataBase.returnBook(currentUser.getUserName(), string.toInt());
+    }
+
+    delete borrowedBooksModel;
+
+    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(currentBorrowedBooksPage,currentUser.getUserName()),true);
+    borrowedBooksList->setModel(borrowedBooksModel);
+
+    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(currentAvailableBooksPage),false);
+    availableBooksList->setModel(availableBooksModel);
 }
+
 
 void MainWindow::logOut()
 {
