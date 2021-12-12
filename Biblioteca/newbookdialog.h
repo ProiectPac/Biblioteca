@@ -21,9 +21,10 @@ private:
     QLineEdit *booksCountLineEdit;
 
     void setupUI();
-    Book getBook();
+
 public:
     NewBookDialog(QWidget *parent = nullptr);
+    Book getBook();
 };
 
 #endif // NEWBOOKDIALOG_H

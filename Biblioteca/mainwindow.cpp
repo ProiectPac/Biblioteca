@@ -20,6 +20,14 @@ void MainWindow::setUpUserBar()
     changeUserPasswordAction->setText("Change Password User");
     connect(changeUserPasswordAction,&QAction::triggered,this,&MainWindow::changeCurrentUserPassword);
     userMenu->addAction(changeUserPasswordAction);
+
+    QAction *addBookAction = new QAction(this);
+    userMenu->addAction(addBookAction);
+
+    addBookAction->setText("Add book");
+    connect(addBookAction,&QAction::triggered,this,&MainWindow::addNewBook);
+
+
 }
 
 void MainWindow::loginDialogFinished()
@@ -251,8 +259,6 @@ MainWindow::MainWindow() : QMainWindow()
 {
     setUpUI();
     setUpUserBar();
-    NewBookDialog *bookDialog = new NewBookDialog(this);
-    bookDialog->exec();
 
     delete loginDialog;
     loginDialog = new LoginDialog(this);
@@ -359,4 +365,23 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
+void MainWindow::addNewBook()
+{
+    delete newBookDialog;
+    newBookDialog = new NewBookDialog(this);
+
+    connect(newBookDialog,&QDialog::finished,this,&MainWindow::addBookFinished);
+
+    newBookDialog->show();
+
+}
+ void MainWindow::addBookFinished()
+ {
+     if(newBookDialog->result() == QDialog::Accepted)
+     {
+         Book newBook = newBookDialog->getBook();
+         dataBase.addBook(newBook);
+     }
+
+ }
 

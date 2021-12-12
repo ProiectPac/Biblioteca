@@ -41,11 +41,13 @@ private:
     QAction* deleteUserAction = nullptr;
     QTextBrowser *bookContent = nullptr;
     BorderLayout *layout = nullptr;
-    LoginDialog* loginDialog = nullptr;
     QTreeView* availableBooksList=nullptr;
     QTreeView* borrowedBooksList=nullptr;
     TreeModel* availableBooksModel=nullptr;
     TreeModel* borrowedBooksModel=nullptr;
+
+    LoginDialog* loginDialog = nullptr;
+    NewBookDialog *newBookDialog = nullptr;
 
     bool hasError=false;
 
@@ -65,6 +67,9 @@ private:
     void previousAvailableBooksButtonOnClick();
     void nextBorrowedBooksButtonOnClick();
     void previousBorrowedBooksButtonOnClick();
+
+    void addNewBook();
+    void addBookFinished();
 
     int currentAvailableBooksPage=0;
     int currentBorrowedBooksPage=0;

@@ -26,11 +26,13 @@ void NewBookDialog::setupUI()
 
     QPushButton *sendButton = new QPushButton(this);
     sendButton->setText("Send book");
+    connect(sendButton,&QPushButton::clicked,this,&QDialog::accept);
 
-    QVBoxLayout *dialogLayout = new QVBoxLayout(this);
+    QVBoxLayout *dialogLayout = new QVBoxLayout();
     dialogLayout->addWidget(inputsBox);
     dialogLayout->addWidget(sendButton);
 
+    setLayout(dialogLayout);
 }
 
 Book NewBookDialog::getBook()
