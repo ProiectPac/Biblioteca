@@ -93,6 +93,10 @@ void TreeModel::setUpModel(std::vector<Book> bookVector)
         titleData << book.getTitle();
         TreeItem* child = new TreeItem(titleData,rootItem);
 
+        QList<QVariant> idData;
+        idData << "ID: " + QString::number(book.getID());
+        TreeItem* id = new TreeItem(idData,child);
+
         QList<QVariant> isbnData;
         isbnData << "ISBN: " + book.getISBN();
         TreeItem* isbn = new TreeItem(isbnData,child);
@@ -113,6 +117,13 @@ void TreeModel::setUpModel(std::vector<Book> bookVector)
         averageRatingData << "Average rating: " + QString::number(book.getAverageRating());
         TreeItem* averageRating = new TreeItem(averageRatingData,child);
 
+        child->appendChild(id);
+        child->appendChild(isbn);
+        child->appendChild(authors);
+        child->appendChild(originalPublicationYear);
+        child->appendChild(languageCode);
+        child->appendChild(averageRating);
+
         if(type==false)
         {
             QList<QVariant> booksCountData;
@@ -128,13 +139,6 @@ void TreeModel::setUpModel(std::vector<Book> bookVector)
             TreeItem* remainingDays = new TreeItem(remainingDaysData,child);
             child->appendChild(remainingDays);
         }
-
-
-        child->appendChild(isbn);
-        child->appendChild(authors);
-        child->appendChild(originalPublicationYear);
-        child->appendChild(languageCode);
-        child->appendChild(averageRating);
 
         rootItem->appendChild(child);
     }

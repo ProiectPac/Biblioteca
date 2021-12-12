@@ -17,7 +17,7 @@
 #include <QHBoxLayout>
 #include "treemodel.h"
 #include "newbookdialog.h"
-
+#include "treeitem.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -58,8 +58,8 @@ private:
     void setUpUserBar();
     void loginDialogFinished();
     void setUpUI();
-    void borrowBook(int bookID);
-    void returnBook(int bookID);
+    void borrowBook(const QModelIndex &index);
+    void returnBook(const QModelIndex &index);
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
