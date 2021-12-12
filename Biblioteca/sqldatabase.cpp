@@ -163,6 +163,26 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
 
 void SQLDataBase::returnBook(QString userName, int bookID)
 {
+    int booksCount=0;
+    QSqlQuery booksCountQuery;
+    booksCountQuery.prepare("SELECT books_count FROM books WHERE id=?");
+    booksCountQuery.addBindValue(bookID);
+    if(!booksCountQuery.exec())
+    {
+        qWarning() << "ERROR: " << booksCountQuery.lastError().text();
+    }
+
+    if(booksCountQuery.first())
+    {
+        booksCount=booksCountQuery.value(0).toInt();
+    }
+
+    QSqlQuery updateQuery;
+    updateQuery.prepare("UPDATE books SET books_count=? WHERE id=?");
+    updateQuery.addBindValue(booksCount+1);
+    updateQuery.addBindValue(bookID);
+    if(!updateQuery.exec())
+        qWarning() << "ERROR: " << updateQuery.lastError().text();
 
     QSqlQuery deleteQuery;
     deleteQuery.prepare("DELETE FROM user_book WHERE book_id = ? AND user_name = ?");
