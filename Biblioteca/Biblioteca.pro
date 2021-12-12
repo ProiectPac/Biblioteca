@@ -14,6 +14,7 @@ SOURCES += \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
+    newbookdialog.cpp \
     sqldatabase.cpp \
     treeitem.cpp \
     treemodel.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     borderlayout.h \
     logindialog.h \
     mainwindow.h \
+    newbookdialog.h \
     sqldatabase.h \
     treeitem.h \
     treemodel.h \

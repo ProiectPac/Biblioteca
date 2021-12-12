@@ -16,6 +16,7 @@
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include "treemodel.h"
+#include "newbookdialog.h"
 
 
 QT_BEGIN_NAMESPACE
