@@ -26,6 +26,10 @@ public:
     void returnBook(QString userName, int bookId);
     std::vector<Book> getBorrowedBooks(int pageNumber, QString userName);
 
+    std::vector<Book> searchAvailableBooks(QString name, QString author, QString ISBN, int pageNumber);
+    std::vector<Book> searchBorrowedBooks(QString name, QString author, QString ISBN, int pageNumber, QString userName);
+    int levenshteinDistance(std::string draft, std::string original);
+
 };
 
 #endif // SQLDATABASE_H

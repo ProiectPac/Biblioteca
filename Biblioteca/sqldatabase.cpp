@@ -203,3 +203,73 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
     }
     return previousBooks;
 }
+
+ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author, QString ISBN,int pageNumber)
+ {
+     static std::vector<int> pageCorespondence = {0};
+     std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
+     int numberOfPages=0;
+     std::vector<Book> matchingBooks;
+     while(matchingBooks.size()<45)
+     {
+         for(auto &book: currentBooks)
+         {
+             if(((levenshteinDistance(book.getTitle().toStdString(),name.toStdString())+levenshteinDistance(book.getAuthor().toStdString(),author.toStdString())+levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString()))/3) < 20)
+             {
+                 matchingBooks.push_back(book);
+             }
+         }
+         numberOfPages++;
+         currentBooks = getAvailableBooks(pageCorespondence[pageNumber]+numberOfPages);
+     }
+    pageCorespondence.push_back(numberOfPages);
+    return matchingBooks;
+ }
+
+  std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author, QString ISBN,int pageNumber, QString userName)
+{
+    static std::vector<int> pageCorespondence = {0};
+    std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
+    int numberOfPages=0;
+    std::vector<Book> matchingBooks;
+    while(matchingBooks.size()<45)
+    {
+        for(auto &book: currentBooks)
+        {
+            if(((levenshteinDistance(book.getTitle().toStdString(),name.toStdString())+levenshteinDistance(book.getAuthor().toStdString(),author.toStdString())+levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString()))/3) < 20)
+            {
+                matchingBooks.push_back(book);
+            }
+        }
+        numberOfPages++;
+        currentBooks = getBorrowedBooks(pageCorespondence[pageNumber]+numberOfPages,userName);
+    }
+   pageCorespondence.push_back(numberOfPages);
+   return matchingBooks;
+}
+int SQLDataBase::levenshteinDistance(std::string draft, std::string original)
+{
+
+        std::vector<std::vector<int>> matrix;
+        matrix.resize(original.size()+1, std::vector<int>(draft.size()+1,0));
+
+        for (int index = 0; index < matrix.size(); index++)
+            matrix[index][matrix[index].size() - 1] = matrix.size() - (index + 1);
+
+        for (int index = matrix[0].size() - 1; index >= 0; index--)
+            matrix[matrix.size() - 1][index] = matrix[index].size() - (index + 1);
+
+        for (int index = matrix.size()-2; index >= 0; index--)
+        {
+            for (int index2 = matrix[index].size() - 2; index2 >= 0;  index2--)
+            {
+                matrix[index][index2] = std::min(matrix[index + 1][index2], std::min(matrix[index + 1][index2 + 1], matrix[index][index2 + 1]));
+
+                if (draft[index2] != original[index])
+                {
+                    matrix[index][index2]++;
+                }
+            }
+        }
+        return matrix[0][0];
+}
