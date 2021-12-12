@@ -3,14 +3,14 @@
 void NewBookDialog::setupUI()
 {
     QFormLayout *inputsLayout = new QFormLayout(this);
-    QLineEdit *titleLineEdit = new QLineEdit(this);
-    QLineEdit *ISBNLineEdit = new QLineEdit(this);
-    QLineEdit *authorsLineEdit = new QLineEdit(this);
-    QLineEdit *publicationYearLineEdit = new QLineEdit(this);
-    QLineEdit *languageLineEdit = new QLineEdit(this);
-    QLineEdit *ratingLineEdit = new QLineEdit(this);
-    QLineEdit *imageURLLineEdit = new QLineEdit(this);
-    QLineEdit *booksCountLineEdit = new QLineEdit(this);
+    titleLineEdit = new QLineEdit(this);
+    ISBNLineEdit = new QLineEdit(this);
+    authorsLineEdit = new QLineEdit(this);
+    publicationYearLineEdit = new QLineEdit(this);
+    languageLineEdit = new QLineEdit(this);
+    ratingLineEdit = new QLineEdit(this);
+    imageURLLineEdit = new QLineEdit(this);
+    booksCountLineEdit = new QLineEdit(this);
 
     inputsLayout->addRow("Title: ",titleLineEdit);
     inputsLayout->addRow("ISBN: ",ISBNLineEdit);
@@ -33,6 +33,21 @@ void NewBookDialog::setupUI()
 
 }
 
+Book NewBookDialog::getBook()
+{
+    QString title = titleLineEdit->text();
+    QString author = authorsLineEdit->text();
+    QString ISBN = ISBNLineEdit->text();
+    int booksCount = booksCountLineEdit->text().toInt();
+    int originalPublicationYear = publicationYearLineEdit->text().toInt();
+    QString language = languageLineEdit->text();
+    float averageRating = ratingLineEdit->text().toFloat();
+    QString imageURL = imageURLLineEdit->text();
+
+    Book newBook(0,ISBN,author,originalPublicationYear,title,language,averageRating, imageURL, "", booksCount);
+    return newBook;
+
+}
 NewBookDialog::NewBookDialog(QWidget *parent):QDialog(parent)
 {
     setupUI();
