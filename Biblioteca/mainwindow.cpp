@@ -471,13 +471,32 @@ void MainWindow::availableBooksCurrentPageChanged(QString text)
 {
     bool *ok = new bool(true);
     int currentPage = text.toInt(ok,10);
+
     if(*ok)
     {
+        if(availableBooksNameLineEdit->text()=="" && availableBooksAuthorLineEdit->text()=="" && availableBooksISBNLineEdit->text()=="")
+        {
         availableBooksCurrentPage = currentPage;
         delete availableBooksModel;
 
         availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
         availableBooksList->setModel(availableBooksModel);
+        }
+        else
+        {
+            for(int index=lastPage;index<=currentPage;++index)
+            {
+                dataBase.getAvailableBooks(index);
+            }
+            delete availableBooksModel;
+            availableBooksCurrentPage=currentPage;
+            if(lastPage<currentPage)
+            {
+                lastPage=currentPage;
+            }
+            availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+            availableBooksList->setModel(availableBooksModel);
+        }
     }
 }
 
@@ -518,6 +537,8 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksNameLineEditTextChanged(QString text)
  {
          availableBooksCurrentPage = 0;
+         lastPage=0;
+         availableBooksCurrentPageLineEdit->setText("0");
          delete availableBooksModel;
 
          availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(text,availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
@@ -527,6 +548,8 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksISBNLineEditTextChanged(QString text)
  {
      availableBooksCurrentPage = 0;
+     lastPage=0;
+     availableBooksCurrentPageLineEdit->setText("0");
      delete availableBooksModel;
 
      availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), text, availableBooksCurrentPage),false);
@@ -536,6 +559,8 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksAuthorLineEditTextChanged(QString text)
  {
      availableBooksCurrentPage = 0;
+     lastPage=0;
+     availableBooksCurrentPageLineEdit->setText("0");
      delete availableBooksModel;
 
      availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), text, availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);

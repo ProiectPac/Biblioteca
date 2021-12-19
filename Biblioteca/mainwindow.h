@@ -95,5 +95,6 @@ private:
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
+    int lastPage=0;
 };
 #endif // MAINWINDOW_H
