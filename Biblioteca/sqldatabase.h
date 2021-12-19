@@ -28,7 +28,50 @@ public:
 
     std::vector<Book> searchAvailableBooks(QString name, QString author, QString ISBN, int pageNumber);
     std::vector<Book> searchBorrowedBooks(QString name, QString author, QString ISBN, int pageNumber, QString userName);
-    int levenshteinDistance(std::string draft, std::string original);
+    static int levenshteinDistance(std::string draft, std::string original);
+
+    class Comp
+    {
+        QString name,author,ISBN;
+    public:
+        Comp(QString name,QString author,QString ISBN)
+        {
+            this->name=name;
+            this->author=author;
+            this->ISBN=ISBN;
+        }
+        bool operator()(Book bookOne, Book bookTwo)
+        {
+            int sumDistance = 0;
+            if(name.length()>0)
+            {
+                sumDistance += levenshteinDistance(bookOne.getTitle().toStdString(),name.toStdString());
+            }
+            if(author.length()>0)
+            {
+                sumDistance += levenshteinDistance(bookOne.getAuthor().toStdString(),author.toStdString());
+            }
+            if(ISBN.length()>0)
+            {
+                sumDistance += levenshteinDistance(bookOne.getISBN().toStdString(),ISBN.toStdString());
+            }
+
+            int sumDistanceAux=0;
+            if(name.length()>0)
+            {
+                sumDistanceAux += levenshteinDistance(bookTwo.getTitle().toStdString(),name.toStdString());
+            }
+            if(author.length()>0)
+            {
+                sumDistanceAux += levenshteinDistance(bookTwo.getAuthor().toStdString(),author.toStdString());
+            }
+            if(ISBN.length()>0)
+            {
+                sumDistanceAux += levenshteinDistance(bookTwo.getISBN().toStdString(),ISBN.toStdString());
+            }
+            return sumDistance<sumDistanceAux;
+        }
+    };
 
 };
 

@@ -279,9 +279,12 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
         numberOfPages++;
         currentBooks = getAvailableBooks(pageCorespondence[pageNumber]+numberOfPages);
     }
+    Comp comparator(name,author,ISBN);
+    std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
     pageCorespondence.push_back(numberOfPages);
     return matchingBooks;
 }
+
 
 std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author, QString ISBN,int pageNumber, QString userName)
 {
@@ -339,6 +342,8 @@ std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author,
         currentBooks = getBorrowedBooks(pageCorespondence[pageNumber]+numberOfPages,userName);
     }
     pageCorespondence.push_back(numberOfPages);
+    Comp comparator(name,author,ISBN);
+    std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
     return matchingBooks;
 }
 int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string2)
