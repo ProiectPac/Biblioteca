@@ -152,8 +152,8 @@ void MainWindow::setUpUI()
     availableBooksISBNLineEdit = new QLineEdit(this);
 
     connect(availableBooksNameLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksNameLineEditTextChanged);
-    //connect(availableBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksAuthorLineEditTextChanged);
-    //connect(availableBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksISBNLineEditTextChanged);
+    connect(availableBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksAuthorLineEditTextChanged);
+    connect(availableBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksISBNLineEditTextChanged);
 
     availableBooksSearch->addRow("Name:",availableBooksNameLineEdit);
     availableBooksSearch->addRow("Author:",availableBooksAuthorLineEdit);
@@ -474,5 +474,23 @@ void MainWindow::addNewBook()
 
          availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(text,availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
          availableBooksList->setModel(availableBooksModel);
+ }
+
+ void MainWindow::availableBooksISBNLineEditTextChanged(QString text)
+ {
+     availableBooksCurrentPage = 0;
+     delete availableBooksModel;
+
+     availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), text, availableBooksCurrentPage),false);
+     availableBooksList->setModel(availableBooksModel);
+ }
+
+ void MainWindow::availableBooksAuthorLineEditTextChanged(QString text)
+ {
+     availableBooksCurrentPage = 0;
+     delete availableBooksModel;
+
+     availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), text, availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+     availableBooksList->setModel(availableBooksModel);
  }
 
