@@ -18,6 +18,7 @@
 #include "treemodel.h"
 #include "newbookdialog.h"
 #include "treeitem.h"
+#include "deletebookdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -48,6 +49,7 @@ private:
 
     LoginDialog* loginDialog = nullptr;
     NewBookDialog *newBookDialog = nullptr;
+    DeleteBookDialog *deleteBookDialog = nullptr;
 
     QLineEdit* availableBooksCurrentPageLineEdit = nullptr;
 
@@ -69,12 +71,14 @@ private:
     void setUser(User newUser);
     void setUpUserBar();
     void loginDialogFinished();
+    void deleteBookDialogFinished();
     void setUpUI();
     void borrowBook(const QModelIndex &index);
     void returnBook(const QModelIndex &index);
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
+    void deleteBook();
 
     void nextAvailableBooksButtonOnClick();
     void previousAvailableBooksButtonOnClick();

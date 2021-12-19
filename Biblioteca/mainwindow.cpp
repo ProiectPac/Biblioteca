@@ -5,29 +5,39 @@ void MainWindow::setUpUserBar()
 {
     userBar = new QMenuBar(this);
     this->setMenuBar(userBar);
+
     userMenu = new QMenu(this);
+    userBar->addMenu(userMenu);
     userMenu->setTitle("User");
+
     logOutAction = new QAction(this);
     logOutAction->setText("Log out");
     connect(logOutAction,&QAction::triggered,this,&MainWindow::logOut);
     userMenu->addAction(logOutAction);
-    userBar->addMenu(userMenu);
+
     deleteUserAction = new QAction(this);
     deleteUserAction->setText("Delete User");
     connect(deleteUserAction,&QAction::triggered,this,&MainWindow::deleteCurrentUser);
     userMenu->addAction(deleteUserAction);
+
     QAction* changeUserPasswordAction = new QAction(this);
     changeUserPasswordAction->setText("Change Password User");
     connect(changeUserPasswordAction,&QAction::triggered,this,&MainWindow::changeCurrentUserPassword);
     userMenu->addAction(changeUserPasswordAction);
 
-    QAction *addBookAction = new QAction(this);
-    userMenu->addAction(addBookAction);
+    QMenu *bookMenu = new QMenu(this);
+    userBar->addMenu(bookMenu);
+    bookMenu->setTitle("Book");
 
+    QAction *addBookAction = new QAction(this);
     addBookAction->setText("Add book");
     connect(addBookAction,&QAction::triggered,this,&MainWindow::addNewBook);
+    bookMenu->addAction(addBookAction);
 
-
+    QAction *deleteBookAction = new QAction(this);
+    deleteBookAction->setText("Delete book");
+    connect(deleteBookAction,&QAction::triggered,this,&MainWindow::deleteBook);
+    bookMenu->addAction(deleteBookAction);
 }
 
 void MainWindow::loginDialogFinished()
@@ -124,6 +134,12 @@ void MainWindow::loginDialogFinished()
     }
     else
         this->close();
+}
+
+void MainWindow::deleteBookDialogFinished()
+{
+    int bookId = deleteBookDialog->getBookID();
+    dataBase.removeBook(bookId);
 }
 
 void MainWindow::setUpUI()
@@ -377,6 +393,14 @@ void MainWindow::changeCurrentUserPassword()
     }
     delete passwordDialog;
     delete repeatPasswordDialog;
+}
+
+void MainWindow::deleteBook()
+{
+    delete deleteBookDialog;
+    deleteBookDialog = new DeleteBookDialog(this);
+    connect(deleteBookDialog,&QInputDialog::finished,this,&MainWindow::deleteBookDialogFinished);
+    deleteBookDialog->show();
 }
 
 void MainWindow::nextAvailableBooksButtonOnClick()

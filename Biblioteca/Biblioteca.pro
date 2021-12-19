@@ -11,6 +11,7 @@ CONFIG += c++11
 SOURCES += \
     book.cpp \
     borderlayout.cpp \
+    deletebookdialog.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 HEADERS += \
     book.h \
     borderlayout.h \
+    deletebookdialog.h \
     logindialog.h \
     mainwindow.h \
     newbookdialog.h \

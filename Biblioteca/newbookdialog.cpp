@@ -2,7 +2,7 @@
 
 void NewBookDialog::setupUI()
 {
-    QFormLayout *inputsLayout = new QFormLayout(this);
+    QFormLayout *inputsLayout = new QFormLayout();
     titleLineEdit = new QLineEdit(this);
     ISBNLineEdit = new QLineEdit(this);
     authorsLineEdit = new QLineEdit(this);
