@@ -108,12 +108,12 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
 
 void SQLDataBase::borrowBook(QString userName, int bookID)
 {
-    if(getBorrowedBooks(0,userName).size()>5)
+    /*if(getBorrowedBooks(0,userName).size()>=5)
     {
         QString message= "You have too many borrowed books!";
         QErrorMessage::qtHandler()->showMessage(message);
         return;
-    }
+    }*/
     for(auto&book:getBorrowedBooks(0,userName))
     {
         if(book.getRemainingDays()==0)

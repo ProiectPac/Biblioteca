@@ -49,6 +49,18 @@ private:
     LoginDialog* loginDialog = nullptr;
     NewBookDialog *newBookDialog = nullptr;
 
+    QLineEdit* availableBooksCurrentPageLineEdit = nullptr;
+
+    QLineEdit* availabeleBooksNameLineEdit = nullptr;
+    QLineEdit* availabeleBooksAuthorLineEdit = nullptr;
+    QLineEdit* availabeleBooksISBNLineEdit = nullptr;
+
+    QLineEdit* borrowedBooksNameLineEdit = nullptr;
+    QLineEdit* borrowedBooksAuthorLineEdit = nullptr;
+    QLineEdit* borrowedBooksISBNLineEdit = nullptr;
+
+    QLineEdit* borrowedCurrentPageLineEdit = nullptr;
+
     bool hasError=false;
 
     User currentUser;
@@ -68,10 +80,13 @@ private:
     void nextBorrowedBooksButtonOnClick();
     void previousBorrowedBooksButtonOnClick();
 
+    void availableBooksCurrentPageChanged(QString text);
+    void borrowedBooksCurrentPageChanged(QString text);
+
     void addNewBook();
     void addBookFinished();
 
-    int currentAvailableBooksPage=0;
-    int currentBorrowedBooksPage=0;
+    int availableBooksCurrentPage=0;
+    int borrowedBooksCurrentPage=0;
 };
 #endif // MAINWINDOW_H
