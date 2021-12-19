@@ -249,10 +249,11 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
         pageCorespondence.resize(0);
         pageCorespondence.push_back(0);
     }
-
-    std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
-    int numberOfPages=0;
     std::vector<Book> matchingBooks;
+    if(pageNumber>=pageCorespondence.size())
+        return matchingBooks;
+    std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
+    int numberOfPages=pageCorespondence[pageNumber]+1;
     while(matchingBooks.size()<45 && currentBooks.size() != 0)
     {
         for(auto &book: currentBooks)
@@ -277,11 +278,14 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
             }
         }
         numberOfPages++;
-        currentBooks = getAvailableBooks(pageCorespondence[pageNumber]+numberOfPages);
+        currentBooks = getAvailableBooks(numberOfPages);
     }
     Comp comparator(name,author,ISBN);
     std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
-    pageCorespondence.push_back(numberOfPages);
+    if(pageNumber+1>=pageCorespondence.size())
+    {
+        pageCorespondence.push_back(numberOfPages);
+    }
     return matchingBooks;
 }
 
@@ -311,10 +315,11 @@ std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author,
         pageCorespondence.resize(0);
         pageCorespondence.push_back(0);
     }
-
-    std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
-    int numberOfPages=0;
     std::vector<Book> matchingBooks;
+    if(pageNumber>=pageCorespondence.size())
+            return matchingBooks;
+    std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
+    int numberOfPages=pageCorespondence[pageNumber]+1;
     while(matchingBooks.size()<45 && currentBooks.size()!=0)
     {
         for(auto &book: currentBooks)
@@ -339,11 +344,14 @@ std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author,
             }
         }
         numberOfPages++;
-        currentBooks = getBorrowedBooks(pageCorespondence[pageNumber]+numberOfPages,userName);
+        currentBooks = getBorrowedBooks(numberOfPages,userName);
     }
-    pageCorespondence.push_back(numberOfPages);
     Comp comparator(name,author,ISBN);
     std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
+    if(pageNumber+1>=pageCorespondence.size())
+    {
+        pageCorespondence.push_back(numberOfPages);
+    }
     return matchingBooks;
 }
 int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string2)
