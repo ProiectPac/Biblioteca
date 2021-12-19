@@ -219,7 +219,10 @@ void MainWindow::setUpUI()
     connect(previousBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::previousBorrowedBooksButtonOnClick);
     connect(nextBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::nextBorrowedBooksButtonOnClick);
 
-    QLineEdit* borrowedCurrentPageLineEdit = new QLineEdit(this);
+    borrowedCurrentPageLineEdit = new QLineEdit(this);
+    borrowedCurrentPageLineEdit->setText("0");
+    connect(borrowedCurrentPageLineEdit, &QLineEdit::textChanged, this, &MainWindow::borrowedBooksCurrentPageChanged);
+
 
     borrowedBooksNavigation->addWidget(previousBorrowedBooksButton);
     borrowedBooksNavigation->addWidget(borrowedCurrentPageLineEdit);
@@ -389,6 +392,7 @@ void MainWindow::previousAvailableBooksButtonOnClick()
 void MainWindow::nextBorrowedBooksButtonOnClick()
 {
     borrowedBooksCurrentPage++;
+    borrowedCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
     delete borrowedBooksModel;
 
     borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
@@ -398,6 +402,7 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
 void MainWindow::previousBorrowedBooksButtonOnClick()
 {
     borrowedBooksCurrentPage--;
+    borrowedCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
     delete borrowedBooksModel;
 
     borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
@@ -415,6 +420,20 @@ void MainWindow::availableBooksCurrentPageChanged(QString text)
 
         availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
         availableBooksList->setModel(availableBooksModel);
+    }
+}
+
+void MainWindow::borrowedBooksCurrentPageChanged(QString text)
+{
+    bool *ok = new bool(true);
+    int currentPage = text.toInt(ok,10);
+    if(*ok)
+    {
+        borrowedBooksCurrentPage=currentPage;
+        delete borrowedBooksModel;
+
+        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        borrowedBooksList->setModel(borrowedBooksModel);
     }
 }
 
