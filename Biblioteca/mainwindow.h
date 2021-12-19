@@ -75,8 +75,10 @@ private:
     void logOut();
     void deleteCurrentUser();
     void changeCurrentUserPassword();
+
     void nextAvailableBooksButtonOnClick();
     void previousAvailableBooksButtonOnClick();
+
     void nextBorrowedBooksButtonOnClick();
     void previousBorrowedBooksButtonOnClick();
 
@@ -85,6 +87,7 @@ private:
 
     void addNewBook();
     void addBookFinished();
+
     void availableBooksNameLineEditTextChanged(QString text);
     void availableBooksISBNLineEditTextChanged(QString text);
     void availableBooksAuthorLineEditTextChanged(QString text);
