@@ -51,9 +51,9 @@ private:
 
     QLineEdit* availableBooksCurrentPageLineEdit = nullptr;
 
-    QLineEdit* availabeleBooksNameLineEdit = nullptr;
-    QLineEdit* availabeleBooksAuthorLineEdit = nullptr;
-    QLineEdit* availabeleBooksISBNLineEdit = nullptr;
+    QLineEdit* availableBooksNameLineEdit = nullptr;
+    QLineEdit* availableBooksAuthorLineEdit = nullptr;
+    QLineEdit* availableBooksISBNLineEdit = nullptr;
 
     QLineEdit* borrowedBooksNameLineEdit = nullptr;
     QLineEdit* borrowedBooksAuthorLineEdit = nullptr;
@@ -85,6 +85,9 @@ private:
 
     void addNewBook();
     void addBookFinished();
+    void availableBooksNameLineEditTextChanged(QString text);
+    void availableBooksISBNLineEditTextChanged(QString text);
+    void availableBooksAuthorLineEditTextChanged(QString text);
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;

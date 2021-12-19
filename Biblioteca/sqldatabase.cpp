@@ -140,12 +140,12 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
     if(booksCountQuery.first())
     {
         booksCount=booksCountQuery.value(0).toInt();
-    if(booksCountQuery.value(0)==0)
-    {
-        QString message= "There are no books left to borrow!";
-        QErrorMessage::qtHandler()->showMessage(message);
-        return;
-    }
+        if(booksCountQuery.value(0)==0)
+        {
+            QString message= "There are no books left to borrow!";
+            QErrorMessage::qtHandler()->showMessage(message);
+            return;
+        }
     }
     QSqlQuery insertQuery;
     insertQuery.prepare("INSERT INTO user_book VALUES(?,?,14)");
@@ -210,43 +210,80 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
         qWarning() << "ERROR: " << insert.lastError().text();
     else
     {
-    if(!booksQuery.exec())
-        qWarning() << "ERROR: " << booksQuery.lastError().text();
-    else
-    {
-        while(booksQuery.next())
+        if(!booksQuery.exec())
+            qWarning() << "ERROR: " << booksQuery.lastError().text();
+        else
         {
-            previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),0,booksQuery.value(9).toInt()));
+            while(booksQuery.next())
+            {
+                previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),0,booksQuery.value(9).toInt()));
+            }
         }
-    }
-    QSqlQuery drop("DROP TABLE borrowed_books");
+        QSqlQuery drop("DROP TABLE borrowed_books");
     }
     return previousBooks;
 }
 
- std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author, QString ISBN,int pageNumber)
- {
-     static std::vector<int> pageCorespondence = {0};
-     std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
-     int numberOfPages=0;
-     std::vector<Book> matchingBooks;
-     while(matchingBooks.size()<45)
-     {
-         for(auto &book: currentBooks)
-         {
-             if(((levenshteinDistance(book.getTitle().toStdString(),name.toStdString())+levenshteinDistance(book.getAuthor().toStdString(),author.toStdString())+levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString()))/3) < 20)
-             {
-                 matchingBooks.push_back(book);
-             }
-         }
-         numberOfPages++;
-         currentBooks = getAvailableBooks(pageCorespondence[pageNumber]+numberOfPages);
-     }
+std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author, QString ISBN,int pageNumber)
+{
+    static std::vector<int> pageCorespondence;
+    static QString staticName;
+    static QString staticAuthor;
+    static QString staticISBN;
+
+    if(staticName!=name)
+    {
+        staticName = name;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+    if(staticAuthor!=author)
+    {
+        staticAuthor = author;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+    if(staticISBN!=ISBN)
+    {
+        staticISBN = ISBN;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+
+    std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
+    int numberOfPages=0;
+    std::vector<Book> matchingBooks;
+    while(matchingBooks.size()<45 && currentBooks.size() != 0)
+    {
+        for(auto &book: currentBooks)
+        {
+            int sumDistance = 0;
+            if(name.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getTitle().toStdString(),name.toStdString());
+            }
+            if(author.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getAuthor().toStdString(),author.toStdString());
+            }
+            if(ISBN.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString());
+            }
+
+            if(sumDistance < 5)
+            {
+                matchingBooks.push_back(book);
+            }
+        }
+        numberOfPages++;
+        currentBooks = getAvailableBooks(pageCorespondence[pageNumber]+numberOfPages);
+    }
     pageCorespondence.push_back(numberOfPages);
     return matchingBooks;
- }
+}
 
-  std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author, QString ISBN,int pageNumber, QString userName)
+std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author, QString ISBN,int pageNumber, QString userName)
 {
     static std::vector<int> pageCorespondence = {0};
     std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
@@ -264,32 +301,45 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
         numberOfPages++;
         currentBooks = getBorrowedBooks(pageCorespondence[pageNumber]+numberOfPages,userName);
     }
-   pageCorespondence.push_back(numberOfPages);
-   return matchingBooks;
+    pageCorespondence.push_back(numberOfPages);
+    return matchingBooks;
 }
-int SQLDataBase::levenshteinDistance(std::string draft, std::string original)
+int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string2)
 {
+    int l_string_length1 = p_string1.length();
+    int l_string_length2 = p_string2.length();
+    int d[l_string_length1+1][l_string_length2+1];
 
-        std::vector<std::vector<int>> matrix;
-        matrix.resize(original.size()+1, std::vector<int>(draft.size()+1,0));
+    int i;
+    int j;
+    int l_cost;
 
-        for (int index = 0; index < matrix.size(); index++)
-            matrix[index][matrix[index].size() - 1] = matrix.size() - (index + 1);
-
-        for (int index = matrix[0].size() - 1; index >= 0; index--)
-            matrix[matrix.size() - 1][index] = matrix[index].size() - (index + 1);
-
-        for (int index = matrix.size()-2; index >= 0; index--)
+    for (i = 0;i <= l_string_length1;i++)
+    {
+        d[i][0] = i;
+    }
+    for(j = 0; j<= l_string_length2; j++)
+    {
+        d[0][j] = j;
+    }
+    for (i = 1;i <= l_string_length1;i++)
+    {
+        for(j = 1; j<= l_string_length2; j++)
         {
-            for (int index2 = matrix[index].size() - 2; index2 >= 0;  index2--)
+            if( p_string1[i-1] == p_string2[j-1] )
             {
-                matrix[index][index2] = std::min(matrix[index + 1][index2], std::min(matrix[index + 1][index2 + 1], matrix[index][index2 + 1]));
-
-                if (draft[index2] != original[index])
-                {
-                    matrix[index][index2]++;
-                }
+                l_cost = 0;
+            }
+            else
+            {
+                l_cost = 1;
+            }
+            d[i][j] = std::min(d[i-1][j] + 1,std::min(d[i][j-1] + 1,d[i-1][j-1] + l_cost));
+            if( (i > 1) && (j > 1) && (p_string1[i-1] == p_string2[j-2]) && (p_string1[i-2] == p_string2[j-1]))
+            {
+                d[i][j] = std::min(d[i][j], d[i-2][j-2] + l_cost);
             }
         }
-        return matrix[0][0];
+    }
+        return d[l_string_length1][l_string_length2];
 }

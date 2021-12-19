@@ -147,13 +147,17 @@ void MainWindow::setUpUI()
     QVBoxLayout* availableBooksLayout = new QVBoxLayout();
 
     QFormLayout* availableBooksSearch = new QFormLayout();
-    availabeleBooksNameLineEdit = new QLineEdit(this);
-    availabeleBooksAuthorLineEdit = new QLineEdit(this);
-    availabeleBooksISBNLineEdit = new QLineEdit(this);
+    availableBooksNameLineEdit = new QLineEdit(this);
+    availableBooksAuthorLineEdit = new QLineEdit(this);
+    availableBooksISBNLineEdit = new QLineEdit(this);
 
-    availableBooksSearch->addRow("Name:",availabeleBooksNameLineEdit);
-    availableBooksSearch->addRow("Author:",availabeleBooksAuthorLineEdit);
-    availableBooksSearch->addRow("ISBN:",availabeleBooksISBNLineEdit);
+    connect(availableBooksNameLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksNameLineEditTextChanged);
+    //connect(availableBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksAuthorLineEditTextChanged);
+    //connect(availableBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksISBNLineEditTextChanged);
+
+    availableBooksSearch->addRow("Name:",availableBooksNameLineEdit);
+    availableBooksSearch->addRow("Author:",availableBooksAuthorLineEdit);
+    availableBooksSearch->addRow("ISBN:",availableBooksISBNLineEdit);
 
     availableBooksSearchBox->setLayout(availableBooksSearch);
 
@@ -461,5 +465,14 @@ void MainWindow::addNewBook()
          dataBase.addBook(newBook);
      }
 
+ }
+
+ void MainWindow::availableBooksNameLineEditTextChanged(QString text)
+ {
+         availableBooksCurrentPage = 0;
+         delete availableBooksModel;
+
+         availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(text,availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+         availableBooksList->setModel(availableBooksModel);
  }
 
