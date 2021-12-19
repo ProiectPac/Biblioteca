@@ -89,6 +89,10 @@ private:
     void availableBooksISBNLineEditTextChanged(QString text);
     void availableBooksAuthorLineEditTextChanged(QString text);
 
+    void borrowedBooksNameLineEditTextChanged(QString text);
+    void borrowedBooksISBNLineEditTextChanged(QString text);
+    void borrowedBooksAuthorLineEditTextChanged(QString text);
+
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
 };

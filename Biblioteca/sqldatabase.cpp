@@ -285,15 +285,52 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
 
 std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author, QString ISBN,int pageNumber, QString userName)
 {
-    static std::vector<int> pageCorespondence = {0};
+    static std::vector<int> pageCorespondence;
+    static QString staticName;
+    static QString staticAuthor;
+    static QString staticISBN;
+
+    if(staticName!=name)
+    {
+        staticName = name;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+    if(staticAuthor!=author)
+    {
+        staticAuthor = author;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+    if(staticISBN!=ISBN)
+    {
+        staticISBN = ISBN;
+        pageCorespondence.resize(0);
+        pageCorespondence.push_back(0);
+    }
+
     std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
     int numberOfPages=0;
     std::vector<Book> matchingBooks;
-    while(matchingBooks.size()<45)
+    while(matchingBooks.size()<45 && currentBooks.size()!=0)
     {
         for(auto &book: currentBooks)
         {
-            if(((levenshteinDistance(book.getTitle().toStdString(),name.toStdString())+levenshteinDistance(book.getAuthor().toStdString(),author.toStdString())+levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString()))/3) < 20)
+            int sumDistance = 0;
+            if(name.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getTitle().toStdString(),name.toStdString());
+            }
+            if(author.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getAuthor().toStdString(),author.toStdString());
+            }
+            if(ISBN.length()>0)
+            {
+                sumDistance += levenshteinDistance(book.getISBN().toStdString(),ISBN.toStdString());
+            }
+
+            if(sumDistance < 5)
             {
                 matchingBooks.push_back(book);
             }

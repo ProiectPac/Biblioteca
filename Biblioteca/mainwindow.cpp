@@ -203,6 +203,10 @@ void MainWindow::setUpUI()
     borrowedBooksAuthorLineEdit = new QLineEdit(this);
     borrowedBooksISBNLineEdit = new QLineEdit(this);
 
+    connect(borrowedBooksNameLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksNameLineEditTextChanged);
+    connect(borrowedBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksAuthorLineEditTextChanged);
+    connect(borrowedBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksISBNLineEditTextChanged);
+
     borrowedBooksSearch->addRow("Name:",borrowedBooksNameLineEdit);
     borrowedBooksSearch->addRow("Author:",borrowedBooksAuthorLineEdit);
     borrowedBooksSearch->addRow("ISBN:",borrowedBooksISBNLineEdit);
@@ -492,5 +496,32 @@ void MainWindow::addNewBook()
 
      availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), text, availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
      availableBooksList->setModel(availableBooksModel);
+ }
+
+ void MainWindow::borrowedBooksNameLineEditTextChanged(QString text)
+ {
+     borrowedBooksCurrentPage = 0;
+     delete borrowedBooksModel;
+
+     borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(text, borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+     borrowedBooksList->setModel(borrowedBooksModel);
+ }
+
+ void MainWindow::borrowedBooksAuthorLineEditTextChanged(QString text)
+ {
+     borrowedBooksCurrentPage = 0;
+     delete borrowedBooksModel;
+
+     borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), text, borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+     borrowedBooksList->setModel(borrowedBooksModel);
+ }
+
+ void MainWindow::borrowedBooksISBNLineEditTextChanged(QString text)
+ {
+     borrowedBooksCurrentPage = 0;
+     delete borrowedBooksModel;
+
+     borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), text, borrowedBooksCurrentPage, currentUser.getUserName()), false);
+     borrowedBooksList->setModel(borrowedBooksModel);
  }
 
