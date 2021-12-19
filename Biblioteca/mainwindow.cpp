@@ -174,6 +174,7 @@ void MainWindow::setUpUI()
 
     availableBooksCurrentPageLineEdit = new QLineEdit(this);
     availableBooksCurrentPageLineEdit->setText("0");
+    availableBooksCurrentPageLineEdit->setAlignment(Qt::AlignHCenter);
     connect(availableBooksCurrentPageLineEdit, &QLineEdit::textChanged, this, &MainWindow::availableBooksCurrentPageChanged);
 
     availableBooksNavigation->addWidget(previousAvailableBooksButton);
@@ -220,6 +221,7 @@ void MainWindow::setUpUI()
     connect(nextBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::nextBorrowedBooksButtonOnClick);
 
     borrowedCurrentPageLineEdit = new QLineEdit(this);
+    borrowedCurrentPageLineEdit->setAlignment(Qt::AlignHCenter);
     borrowedCurrentPageLineEdit->setText("0");
     connect(borrowedCurrentPageLineEdit, &QLineEdit::textChanged, this, &MainWindow::borrowedBooksCurrentPageChanged);
 
@@ -381,6 +383,8 @@ void MainWindow::nextAvailableBooksButtonOnClick()
 
 void MainWindow::previousAvailableBooksButtonOnClick()
 {
+    if(availableBooksCurrentPage==0)
+        return;
     availableBooksCurrentPage--;
     availableBooksCurrentPageLineEdit->setText(QString::number(availableBooksCurrentPage));
     delete availableBooksModel;
@@ -401,6 +405,8 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
 
 void MainWindow::previousBorrowedBooksButtonOnClick()
 {
+    if(borrowedBooksCurrentPage == 0)
+        return;
     borrowedBooksCurrentPage--;
     borrowedCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
     delete borrowedBooksModel;
