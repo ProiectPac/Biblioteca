@@ -59,7 +59,7 @@ private:
     QLineEdit* borrowedBooksAuthorLineEdit = nullptr;
     QLineEdit* borrowedBooksISBNLineEdit = nullptr;
 
-    QLineEdit* borrowedCurrentPageLineEdit = nullptr;
+    QLineEdit* borrowedBooksCurrentPageLineEdit = nullptr;
 
     bool hasError=false;
 
@@ -95,6 +95,7 @@ private:
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
-    int lastPage=0;
+    int availableBooksLastPage=0;
+    int borrowedBooksLastPage=0;
 };
 #endif // MAINWINDOW_H

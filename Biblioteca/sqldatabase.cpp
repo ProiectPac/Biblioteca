@@ -253,7 +253,7 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
     if(pageNumber>=pageCorespondence.size())
         return matchingBooks;
     std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
-    int numberOfPages=pageCorespondence[pageNumber]+1;
+    int numberOfPages=pageCorespondence[pageNumber];
     while(matchingBooks.size()<45 && currentBooks.size() != 0)
     {
         for(auto &book: currentBooks)
@@ -319,7 +319,7 @@ std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author,
     if(pageNumber>=pageCorespondence.size())
             return matchingBooks;
     std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
-    int numberOfPages=pageCorespondence[pageNumber]+1;
+    int numberOfPages=pageCorespondence[pageNumber];
     while(matchingBooks.size()<45 && currentBooks.size()!=0)
     {
         for(auto &book: currentBooks)

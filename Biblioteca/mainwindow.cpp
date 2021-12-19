@@ -228,14 +228,14 @@ void MainWindow::setUpUI()
     connect(previousBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::previousBorrowedBooksButtonOnClick);
     connect(nextBorrowedBooksButton,&QPushButton::clicked,this,&MainWindow::nextBorrowedBooksButtonOnClick);
 
-    borrowedCurrentPageLineEdit = new QLineEdit(this);
-    borrowedCurrentPageLineEdit->setAlignment(Qt::AlignHCenter);
-    borrowedCurrentPageLineEdit->setText("0");
-    connect(borrowedCurrentPageLineEdit, &QLineEdit::textChanged, this, &MainWindow::borrowedBooksCurrentPageChanged);
+    borrowedBooksCurrentPageLineEdit = new QLineEdit(this);
+    borrowedBooksCurrentPageLineEdit->setAlignment(Qt::AlignHCenter);
+    borrowedBooksCurrentPageLineEdit->setText("0");
+    connect(borrowedBooksCurrentPageLineEdit, &QLineEdit::textChanged, this, &MainWindow::borrowedBooksCurrentPageChanged);
 
 
     borrowedBooksNavigation->addWidget(previousBorrowedBooksButton);
-    borrowedBooksNavigation->addWidget(borrowedCurrentPageLineEdit);
+    borrowedBooksNavigation->addWidget(borrowedBooksCurrentPageLineEdit);
     borrowedBooksNavigation->addWidget(nextBorrowedBooksButton);
 
     borrowedBooksNavigationBox->setLayout(borrowedBooksNavigation);
@@ -428,7 +428,7 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
     if(borrowedBooksNameLineEdit->text()=="" && borrowedBooksAuthorLineEdit->text()=="" && borrowedBooksISBNLineEdit->text()=="")
     {
         borrowedBooksCurrentPage++;
-        borrowedCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
+        borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
         borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
@@ -451,7 +451,7 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
     if(borrowedBooksNameLineEdit->text()=="" && borrowedBooksAuthorLineEdit->text()=="" && borrowedBooksISBNLineEdit->text()=="")
     {
         borrowedBooksCurrentPage--;
-        borrowedCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
+        borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
         borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
@@ -484,15 +484,15 @@ void MainWindow::availableBooksCurrentPageChanged(QString text)
         }
         else
         {
-            for(int index=lastPage;index<=currentPage;++index)
+            for(int index=availableBooksLastPage;index<=currentPage;++index)
             {
                 dataBase.getAvailableBooks(index);
             }
             delete availableBooksModel;
             availableBooksCurrentPage=currentPage;
-            if(lastPage<currentPage)
+            if(availableBooksLastPage<currentPage)
             {
-                lastPage=currentPage;
+                availableBooksLastPage=currentPage;
             }
             availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
             availableBooksList->setModel(availableBooksModel);
@@ -506,11 +506,30 @@ void MainWindow::borrowedBooksCurrentPageChanged(QString text)
     int currentPage = text.toInt(ok,10);
     if(*ok)
     {
+        if(borrowedBooksNameLineEdit->text()=="" && borrowedBooksAuthorLineEdit->text()=="" && borrowedBooksISBNLineEdit->text()=="")
+        {
         borrowedBooksCurrentPage=currentPage;
         delete borrowedBooksModel;
 
         borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
         borrowedBooksList->setModel(borrowedBooksModel);
+        }
+        else
+        {
+            for(int index=borrowedBooksLastPage;index<=currentPage;++index)
+            {
+                dataBase.getBorrowedBooks(index,currentUser.getUserName());
+            }
+            delete borrowedBooksModel;
+            borrowedBooksCurrentPage = currentPage;
+            if(borrowedBooksLastPage< borrowedBooksCurrentPage)
+            {
+                borrowedBooksLastPage = borrowedBooksCurrentPage;
+            }
+
+            borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+            borrowedBooksList->setModel(borrowedBooksModel);
+        }
     }
 }
 
@@ -537,7 +556,7 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksNameLineEditTextChanged(QString text)
  {
          availableBooksCurrentPage = 0;
-         lastPage=0;
+         availableBooksLastPage=0;
          availableBooksCurrentPageLineEdit->setText("0");
          delete availableBooksModel;
 
@@ -548,7 +567,7 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksISBNLineEditTextChanged(QString text)
  {
      availableBooksCurrentPage = 0;
-     lastPage=0;
+     availableBooksLastPage=0;
      availableBooksCurrentPageLineEdit->setText("0");
      delete availableBooksModel;
 
@@ -559,7 +578,7 @@ void MainWindow::addNewBook()
  void MainWindow::availableBooksAuthorLineEditTextChanged(QString text)
  {
      availableBooksCurrentPage = 0;
-     lastPage=0;
+     availableBooksLastPage=0;
      availableBooksCurrentPageLineEdit->setText("0");
      delete availableBooksModel;
 
@@ -570,6 +589,8 @@ void MainWindow::addNewBook()
  void MainWindow::borrowedBooksNameLineEditTextChanged(QString text)
  {
      borrowedBooksCurrentPage = 0;
+     borrowedBooksLastPage=0;
+     borrowedBooksCurrentPageLineEdit->setText("0");
      delete borrowedBooksModel;
 
      borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(text, borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
@@ -579,6 +600,8 @@ void MainWindow::addNewBook()
  void MainWindow::borrowedBooksAuthorLineEditTextChanged(QString text)
  {
      borrowedBooksCurrentPage = 0;
+     borrowedBooksLastPage=0;
+     borrowedBooksCurrentPageLineEdit->setText("0");
      delete borrowedBooksModel;
 
      borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), text, borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
@@ -588,9 +611,10 @@ void MainWindow::addNewBook()
  void MainWindow::borrowedBooksISBNLineEditTextChanged(QString text)
  {
      borrowedBooksCurrentPage = 0;
+     borrowedBooksLastPage=0;
+     borrowedBooksCurrentPageLineEdit->setText("0");
      delete borrowedBooksModel;
 
      borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), text, borrowedBooksCurrentPage, currentUser.getUserName()), false);
      borrowedBooksList->setModel(borrowedBooksModel);
  }
-
