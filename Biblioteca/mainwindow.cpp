@@ -364,13 +364,45 @@ void MainWindow::returnBook(const QModelIndex &index)
         dataBase.returnBook(currentUser.getUserName(), string.toInt());
     }
 
-    delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
-    borrowedBooksList->setModel(borrowedBooksModel);
+    if(availableBooksNameLineEdit->text()=="" && availableBooksAuthorLineEdit->text()=="" && availableBooksISBNLineEdit->text()=="")
+    {
+        delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
-    availableBooksList->setModel(availableBooksModel);
+        availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+        availableBooksList->setModel(availableBooksModel);
+    }
+    else
+    {
+        dataBase.searchAvailableBooks("", availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), 0);
+
+        for(int index=0;index<=availableBooksLastPage; ++index)
+        {
+            dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), index);
+        }
+        delete availableBooksModel;
+        availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+        availableBooksList->setModel(availableBooksModel);
+    }
+
+    if(borrowedBooksNameLineEdit->text()=="" && borrowedBooksAuthorLineEdit->text()=="" && borrowedBooksISBNLineEdit->text()=="")
+    {
+        delete borrowedBooksModel;
+
+        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        borrowedBooksList->setModel(borrowedBooksModel);
+    }
+    else
+    {
+        dataBase.searchBorrowedBooks("", borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), 0, currentUser.getUserName());
+        for(int index=0; index<=borrowedBooksLastPage; ++index)
+        {
+            dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), index, currentUser.getUserName());
+        }
+        delete borrowedBooksModel;
+        borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+        borrowedBooksList->setModel(borrowedBooksModel);
+    }
 }
 
 
