@@ -167,9 +167,9 @@ void MainWindow::setUpUI()
     availableBooksAuthorLineEdit = new QLineEdit(this);
     availableBooksISBNLineEdit = new QLineEdit(this);
 
-    connect(availableBooksNameLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksNameLineEditTextChanged);
-    connect(availableBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksAuthorLineEditTextChanged);
-    connect(availableBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::availableBooksISBNLineEditTextChanged);
+    connect(availableBooksNameLineEdit,&QLineEdit::returnPressed,this,&MainWindow::availableBooksNameLineEditReturnPressed);
+    connect(availableBooksAuthorLineEdit,&QLineEdit::returnPressed,this,&MainWindow::availableBooksAuthorLineEditReturnPressed);
+    connect(availableBooksISBNLineEdit,&QLineEdit::returnPressed,this,&MainWindow::availableBooksISBNLineEditReturnPressed);
 
     availableBooksSearch->addRow("Name:",availableBooksNameLineEdit);
     availableBooksSearch->addRow("Author:",availableBooksAuthorLineEdit);
@@ -219,9 +219,9 @@ void MainWindow::setUpUI()
     borrowedBooksAuthorLineEdit = new QLineEdit(this);
     borrowedBooksISBNLineEdit = new QLineEdit(this);
 
-    connect(borrowedBooksNameLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksNameLineEditTextChanged);
-    connect(borrowedBooksAuthorLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksAuthorLineEditTextChanged);
-    connect(borrowedBooksISBNLineEdit,&QLineEdit::textChanged,this,&MainWindow::borrowedBooksISBNLineEditTextChanged);
+    connect(borrowedBooksNameLineEdit,&QLineEdit::returnPressed,this,&MainWindow::borrowedBooksNameLineEditReturnPressed);
+    connect(borrowedBooksAuthorLineEdit,&QLineEdit::returnPressed,this,&MainWindow::borrowedBooksAuthorLineEditReturnPressed);
+    connect(borrowedBooksISBNLineEdit,&QLineEdit::returnPressed,this,&MainWindow::borrowedBooksISBNLineEditReturnPressed);
 
     borrowedBooksSearch->addRow("Name:",borrowedBooksNameLineEdit);
     borrowedBooksSearch->addRow("Author:",borrowedBooksAuthorLineEdit);
@@ -582,68 +582,68 @@ void MainWindow::addBookFinished()
 
 }
 
-void MainWindow::availableBooksNameLineEditTextChanged(QString text)
+void MainWindow::availableBooksNameLineEditReturnPressed()
 {
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
     delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(text,availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
-void MainWindow::availableBooksISBNLineEditTextChanged(QString text)
+void MainWindow::availableBooksISBNLineEditReturnPressed()
 {
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
     delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), text, availableBooksCurrentPage),false);
+    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
-void MainWindow::availableBooksAuthorLineEditTextChanged(QString text)
+void MainWindow::availableBooksAuthorLineEditReturnPressed()
 {
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
     delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), text, availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
-void MainWindow::borrowedBooksNameLineEditTextChanged(QString text)
+void MainWindow::borrowedBooksNameLineEditReturnPressed()
 {
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(text, borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
-void MainWindow::borrowedBooksAuthorLineEditTextChanged(QString text)
+void MainWindow::borrowedBooksAuthorLineEditReturnPressed()
 {
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), text, borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
-void MainWindow::borrowedBooksISBNLineEditTextChanged(QString text)
+void MainWindow::borrowedBooksISBNLineEditReturnPressed()
 {
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
     delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), text, borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
     borrowedBooksList->setModel(borrowedBooksModel);
 }

@@ -92,13 +92,13 @@ private:
     void addNewBook();
     void addBookFinished();
 
-    void availableBooksNameLineEditTextChanged(QString text);
-    void availableBooksISBNLineEditTextChanged(QString text);
-    void availableBooksAuthorLineEditTextChanged(QString text);
+    void availableBooksNameLineEditReturnPressed();
+    void availableBooksISBNLineEditReturnPressed();
+    void availableBooksAuthorLineEditReturnPressed();
 
-    void borrowedBooksNameLineEditTextChanged(QString text);
-    void borrowedBooksISBNLineEditTextChanged(QString text);
-    void borrowedBooksAuthorLineEditTextChanged(QString text);
+    void borrowedBooksNameLineEditReturnPressed();
+    void borrowedBooksISBNLineEditReturnPressed();
+    void borrowedBooksAuthorLineEditReturnPressed();
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
