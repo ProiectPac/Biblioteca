@@ -27,6 +27,7 @@ public:
     void borrowBook(QString userName, int bookId);
     void returnBook(QString userName, int bookId);
     std::vector<Book> getBorrowedBooks(int pageNumber, QString userName);
+    Book getBorrowedBook(int id,QString userName);
 
     std::vector<Book> searchAvailableBooks(QString name, QString author, QString ISBN, int pageNumber);
     std::vector<Book> searchBorrowedBooks(QString name, QString author, QString ISBN, int pageNumber, QString userName);
