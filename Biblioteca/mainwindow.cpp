@@ -513,9 +513,9 @@ void MainWindow::availableBooksCurrentPageChanged(QString text)
         }
         else
         {
-            for(int index=availableBooksLastPage;index<=currentPage;++index)
+            for(int index=availableBooksLastPage+1;index<=currentPage;++index)
             {
-                dataBase.getAvailableBooks(index);
+                dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), index);
             }
             delete availableBooksModel;
             availableBooksCurrentPage=currentPage;
@@ -547,7 +547,7 @@ void MainWindow::borrowedBooksCurrentPageChanged(QString text)
         {
             for(int index=borrowedBooksLastPage;index<=currentPage;++index)
             {
-                dataBase.getBorrowedBooks(index,currentUser.getUserName());
+                dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), index, currentUser.getUserName());
             }
             delete borrowedBooksModel;
             borrowedBooksCurrentPage = currentPage;

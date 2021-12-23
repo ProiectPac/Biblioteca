@@ -96,6 +96,24 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
     return availableBooks;
 }
 
+Book SQLDataBase::getBook(int id)
+{
+    QSqlQuery bookQuery;
+    bookQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count FROM books WHERE id = ?");
+    bookQuery.addBindValue(id);
+    if(!bookQuery.exec())
+        qWarning() << "ERROR: " << bookQuery.lastError().text();
+    else
+    {
+        if(bookQuery.first())
+        {
+            return Book(bookQuery.value(0).toInt(), bookQuery.value(1).toString(),bookQuery.value(2).toString(),bookQuery.value(3).toInt(), bookQuery.value(4).toString(),bookQuery.value(5).toString(),bookQuery.value(6).toFloat(),bookQuery.value(7).toString(),bookQuery.value(8).toString(),bookQuery.value(9).toInt());
+        }
+    }
+    return Book();
+}
+
+
 void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordHash)
 {
     QSqlQuery query;
@@ -226,7 +244,7 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
 
 std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author, QString ISBN,int pageNumber)
 {
-    static std::vector<int> pageCorespondence;
+    static std::unordered_multimap<int,int> pages;
     static QString staticName;
     static QString staticAuthor;
     static QString staticISBN;
@@ -234,27 +252,37 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
     if(staticName!=name)
     {
         staticName = name;
-        pageCorespondence.resize(0);
-        pageCorespondence.push_back(0);
+        pages.clear();
     }
     if(staticAuthor!=author)
     {
         staticAuthor = author;
-        pageCorespondence.resize(0);
-        pageCorespondence.push_back(0);
+        pages.clear();
     }
     if(staticISBN!=ISBN)
     {
         staticISBN = ISBN;
-        pageCorespondence.resize(0);
-        pageCorespondence.push_back(0);
+        pages.clear();
     }
+
+    Comp comparator(name,author,ISBN);
     std::vector<Book> matchingBooks;
-    if(pageNumber>=pageCorespondence.size())
+
+    if(pages.find(pageNumber)!=pages.end())
+    {
+        auto range = pages.equal_range(pageNumber);
+        for(auto iterator = range.first;iterator!=range.second;iterator++)
+        {
+            matchingBooks.push_back(getBook(iterator->second));
+        }
+
         return matchingBooks;
-    std::vector<Book> currentBooks = getAvailableBooks(pageCorespondence[pageNumber]);
-    int numberOfPages=pageCorespondence[pageNumber];
-    while(matchingBooks.size()<45 && currentBooks.size() != 0)
+    }
+
+    int currentPage=0;
+    std::vector<Book> currentBooks = getAvailableBooks(currentPage++);
+
+    while(currentBooks.size() != 0)
     {
         for(auto &book: currentBooks)
         {
@@ -274,18 +302,48 @@ std::vector<Book> SQLDataBase::searchAvailableBooks(QString name, QString author
 
             if(sumDistance < 5)
             {
-                matchingBooks.push_back(book);
+                bool ok=true;
+                for(int page=0;page<currentPage;page++)
+                {
+                    auto range = pages.equal_range(page);
+                    for(auto iterator = range.first;iterator!=range.second;iterator++)
+                    {
+                        if(iterator->second == book.getID())
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if(ok==false)
+                        break;
+                }
+                if(ok)
+                {
+                    matchingBooks.push_back(book);
+                }
             }
         }
-        numberOfPages++;
-        currentBooks = getAvailableBooks(numberOfPages);
+        if(matchingBooks.size()>=90)
+        {
+            std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
+            matchingBooks.resize(45);
+        }
+        currentBooks = getAvailableBooks(currentPage++);
     }
-    Comp comparator(name,author,ISBN);
+
     std::sort(matchingBooks.begin(),matchingBooks.end(),comparator);
-    if(pageNumber+1>=pageCorespondence.size())
+
+    if(matchingBooks.size()>45)
     {
-        pageCorespondence.push_back(numberOfPages);
+        matchingBooks.resize(45);
     }
+
+
+    for(auto& book:matchingBooks)
+    {
+        pages.insert(std::make_pair(pageNumber,book.getID()));
+    }
+
     return matchingBooks;
 }
 
@@ -317,7 +375,7 @@ std::vector<Book> SQLDataBase::searchBorrowedBooks(QString name, QString author,
     }
     std::vector<Book> matchingBooks;
     if(pageNumber>=pageCorespondence.size())
-            return matchingBooks;
+        return matchingBooks;
     std::vector<Book> currentBooks = getBorrowedBooks(pageCorespondence[pageNumber],userName);
     int numberOfPages=pageCorespondence[pageNumber];
     while(matchingBooks.size()<45 && currentBooks.size()!=0)
@@ -391,5 +449,5 @@ int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string
             }
         }
     }
-        return d[l_string_length1][l_string_length2];
+    return d[l_string_length1][l_string_length2];
 }

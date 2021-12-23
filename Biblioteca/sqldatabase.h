@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QErrorMessage>
+#include <map>
 
 class SQLDataBase
 {
@@ -21,6 +22,7 @@ public:
     void addBook(Book book);
     void removeBook(int bookId);
     std::vector<Book> getAvailableBooks(int pageNumber);
+    Book getBook(int id);
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
     void borrowBook(QString userName, int bookId);
     void returnBook(QString userName, int bookId);
