@@ -1,7 +1,6 @@
-#include "TCPSocket.h"
+#include "tcpsocket.h"
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#pragma comment(lib, "Ws2_32.lib")
 
 TCPSocket::TCPSocket()
 {
@@ -66,9 +65,9 @@ void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
     }
 }
 
-void TCPSocket::Listen(uint16_t)
+void TCPSocket::Listen(uint16_t port)
 {
-    struct addrinfo* result = nullptr, * ptr = nullptr, hints;
+    struct addrinfo* result = nullptr, hints;
 
     ZeroMemory(&hints, sizeof(hints));    // memset to 0
     hints.ai_family = AF_INET;            // IPv4
