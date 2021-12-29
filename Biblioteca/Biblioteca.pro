@@ -17,6 +17,7 @@ SOURCES += \
     mainwindow.cpp \
     newbookdialog.cpp \
     sqldatabase.cpp \
+    tcpsocket.cpp \
     treeitem.cpp \
     treemodel.cpp \
     user.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     mainwindow.h \
     newbookdialog.h \
     sqldatabase.h \
+    tcpsocket.h \
     treeitem.h \
     treemodel.h \
     user.h
