@@ -107,3 +107,12 @@ void TCPSocket::Send(void *data, uint32_t size)
         std::cerr << "send failed: " << WSAGetLastError;
     }
 }
+
+void TCPSocket::Receive(void *data, uint32_t size)
+{
+    int iRecvResult = recv(connectSocket, (char*)data, size, 0);
+    if (iRecvResult < 0)
+    {
+        std::cerr << "receive failed: " << WSAGetLastError;
+    }
+}
