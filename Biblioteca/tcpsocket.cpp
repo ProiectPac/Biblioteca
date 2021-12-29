@@ -3,7 +3,7 @@
 #include <ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-TCPSockets::TCPSockets()
+TCPSocket::TCPSocket()
 {
     WSADATA wsaData;
 
@@ -23,43 +23,12 @@ TCPSockets::TCPSockets()
     }
 }
 
-TCPSockets::TCPSockets(SOCKET socket)
+TCPSocket::TCPSocket(SOCKET socket)
 {
     this->connectSocket = socket;
 }
 
-TCPSockets::~TCPSockets()
+TCPSocket::~TCPSocket()
 {
     closesocket(connectSocket);
-}
-
-void TCPSockets::ConnectToServer(const std::string& address, uint16_t port)
-{
-    addrinfo* result = NULL, hints;
-
-    ZeroMemory(&hints, sizeof(hints));    // memset to 0
-    hints.ai_family = AF_INET;
-
-    // *** Resolve the server address and port (can be also names like "localhost") ***
-    int iResult = getaddrinfo(address.c_str(), std::to_string(port).c_str(), &hints, &result);
-    if (iResult != 0)
-    {
-        std::cerr << "getaddrinfo failed: " << iResult;
-        freeaddrinfo(result);
-    }
-
-    // Attempt to connect to the first address returned by the call to getaddrinfo
-    iResult = connect(connectSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR)
-    {
-        closesocket(connectSocket);
-        connectSocket = INVALID_SOCKET;
-    }
-
-    freeaddrinfo(result);
-
-    if (connectSocket == INVALID_SOCKET)
-    {
-        std::cerr << "Unable to connect to server!\n";
-    }
 }

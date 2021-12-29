@@ -5,13 +5,12 @@
 #include <ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 
-class TCPSockets
+class TCPSocket
 {
 public:
-    TCPSockets();
-    TCPSockets(SOCKET socket);
-    ~TCPSockets();
-    void ConnectToServer(const std::string&, uint16_t);
+    TCPSocket();
+    TCPSocket(SOCKET socket);
+    ~TCPSocket();
 private:
     SOCKET connectSocket;
 };
