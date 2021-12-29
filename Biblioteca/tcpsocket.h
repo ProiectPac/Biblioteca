@@ -11,6 +11,7 @@ public:
     TCPSocket();
     TCPSocket(SOCKET socket);
     ~TCPSocket();
+    void ConnectToServer(const std::string&, uint16_t);
 private:
     SOCKET connectSocket;
 };
