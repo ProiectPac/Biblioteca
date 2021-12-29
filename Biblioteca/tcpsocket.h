@@ -15,6 +15,7 @@ public:
     void Listen(uint16_t);
     void Send(void* data, uint32_t size);
     void Receive(void* data, uint32_t size);
+    TCPSocket Accept();
 private:
     SOCKET connectSocket;
 };

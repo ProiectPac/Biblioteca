@@ -116,3 +116,14 @@ void TCPSocket::Receive(void *data, uint32_t size)
         std::cerr << "receive failed: " << WSAGetLastError;
     }
 }
+
+TCPSocket TCPSocket::Accept()
+{
+    SOCKET ClientSocket = INVALID_SOCKET;
+    ClientSocket = accept(connectSocket, NULL, NULL);
+    if (ClientSocket == INVALID_SOCKET)
+    {
+        std::cerr << "accept failed: " << WSAGetLastError();
+    }
+    return TCPSocket(ClientSocket);
+}
