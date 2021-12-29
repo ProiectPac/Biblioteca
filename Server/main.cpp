@@ -5,13 +5,14 @@
 #include "user.h"
 #include <string.h>
 
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     TCPSocket connectionsSocket;
     connectionsSocket.Listen(27015);
     auto client = connectionsSocket.Accept();
-    std::vector<std::string>messasge;
+    std::vector<std::string>message;
     while(true)
     {
         const int length = 512;
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
         while(pointer)
         {
             std::string word(pointer);
-            messasge.push_back(word);
+            message.push_back(word);
             pointer=std::strtok(NULL, " ");
 
         }
