@@ -106,7 +106,7 @@ void MainWindow::loginDialogFinished()
                 }
                 else
                 {
-                    QString message= "UserName/password combination is not correct.";
+                    QString message= "UserName/Password combination is not correct.";
                     QErrorMessage *errorMessage = QErrorMessage::qtHandler();
 
                     delete loginDialog;

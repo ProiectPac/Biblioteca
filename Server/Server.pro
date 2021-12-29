@@ -1,4 +1,4 @@
-QT += core gui sql
+QT += sql
 
 CONFIG += c++11 console
 CONFIG -= app_bundle
@@ -11,6 +11,7 @@ LIBS += -lws2_32
 SOURCES += \
         book.cpp \
         main.cpp \
+        messageinterpretor.cpp \
         sqldatabase.cpp \
         tcpsocket.cpp \
         user.cpp
@@ -22,6 +23,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     book.h \
+    messageinterpretor.h \
     sqldatabase.h \
     tcpsocket.h \
     user.h

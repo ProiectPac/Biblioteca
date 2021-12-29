@@ -6,7 +6,6 @@
 #include "logindialog.h"
 #include <QErrorMessage>
 #include <memory>
-#include "sqldatabase.h"
 #include <QInputDialog>
 #include <QTextBrowser>
 #include "borderlayout.h"
@@ -66,7 +65,6 @@ private:
     bool hasError=false;
 
     User currentUser;
-    SQLDataBase dataBase;
 
     void setUser(User newUser);
     void setUpUserBar();
