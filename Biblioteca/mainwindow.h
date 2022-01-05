@@ -18,6 +18,7 @@
 #include "newbookdialog.h"
 #include "treeitem.h"
 #include "deletebookdialog.h"
+#include "tcpsocket.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

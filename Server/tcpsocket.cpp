@@ -3,13 +3,7 @@
 #include <ws2tcpip.h>
 
 TCPSocket::TCPSocket()
-{
-    WSADATA wsaData;
-
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-    }
+{    
     // *** Create a socket ***
     connectSocket = INVALID_SOCKET;
 
@@ -31,8 +25,6 @@ TCPSocket::~TCPSocket()
 {
     closesocket(connectSocket);
 }
-
-
 
 void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
 {
@@ -84,7 +76,7 @@ void TCPSocket::Listen(uint16_t port)
     iResult = bind(connectSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR)
     {
-        std::cerr << "bind failed with error: " << WSAGetLastError;
+        std::cerr << "bind failed with error: " << WSAGetLastError();
         freeaddrinfo(result);
         closesocket(connectSocket);
     }
@@ -93,7 +85,7 @@ void TCPSocket::Listen(uint16_t port)
     // *** Listening on the socket ***
     if (listen(connectSocket, SOMAXCONN) == SOCKET_ERROR)
     {
-        std::cerr << "Listen failed with error: " << WSAGetLastError;
+        std::cerr << "Listen failed with error: " << WSAGetLastError();
         closesocket(connectSocket);
     }
 }
@@ -103,7 +95,7 @@ void TCPSocket::Send(void *data, uint32_t size)
     int iSendResult = send(connectSocket, (char*)data, size, 0);
     if (iSendResult < 0)
     {
-        std::cerr << "send failed: " << WSAGetLastError;
+        std::cerr << "send failed: " << WSAGetLastError();
     }
 }
 
@@ -112,11 +104,11 @@ void TCPSocket::Receive(void *data, uint32_t size)
     int iRecvResult = recv(connectSocket, (char*)data, size, 0);
     if (iRecvResult < 0)
     {
-        std::cerr << "receive failed: " << WSAGetLastError;
+        std::cerr << "receive failed: " << WSAGetLastError();
     }
 }
 
-TCPSocket TCPSocket::Accept()
+SOCKET TCPSocket::Accept()
 {
     SOCKET ClientSocket = INVALID_SOCKET;
     ClientSocket = accept(connectSocket, NULL, NULL);
@@ -124,5 +116,15 @@ TCPSocket TCPSocket::Accept()
     {
         std::cerr << "accept failed: " << WSAGetLastError();
     }
-    return TCPSocket(ClientSocket);
+    return ClientSocket;
+}
+
+void TCPSocket::startUp()
+{
+    WSADATA wsaData;
+
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed: %d\n", iResult);
+    }
 }

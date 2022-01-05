@@ -3,6 +3,7 @@
 
 void MainWindow::setUpUserBar()
 {
+    TCPSocket::startUp();
     userBar = new QMenuBar(this);
     this->setMenuBar(userBar);
 

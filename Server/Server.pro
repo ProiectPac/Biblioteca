@@ -10,8 +10,8 @@ LIBS += -lws2_32
 
 SOURCES += \
         book.cpp \
+        controller.cpp \
         main.cpp \
-        messageinterpreter.cpp \
         sqldatabase.cpp \
         tcpsocket.cpp \
         user.cpp
@@ -23,7 +23,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     book.h \
-    messageinterpreter.h \
+    controller.h \
     sqldatabase.h \
     tcpsocket.h \
     user.h
