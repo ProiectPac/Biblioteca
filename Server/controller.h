@@ -39,6 +39,7 @@ private:
     SQLDataBase dataBase;
     void login(std::vector<std::string> message);
     void registerAccount(std::vector<std::string> message);
+    void updateUserPassword(std::vector<std::string> message);
     void receiveComand();
     Controller() = default;
 public:

@@ -138,6 +138,33 @@ void Controller::registerAccount(std::vector<std::string> message)
     }
 }
 
+void Controller::updateUserPassword(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    else
+    {
+        if(message.size()==1)
+        {
+            const int len = 512;
+            char buffer[len]="Password can't be empty";
+            client->Send(buffer,len);
+            return;
+        }
+        else
+        {
+            const int len = 512;
+            char buffer[len]="Too many parameters";
+            client->Send(buffer,len);
+        }
+    }
+}
+
 void Controller::receiveComand()
 {
     std::vector<std::string>message;
