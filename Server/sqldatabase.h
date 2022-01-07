@@ -16,6 +16,7 @@ public:
     SQLDataBase();
     void addUser(User user);
     User findUser(QString name, unsigned int passwordHash);
+    User findUser(QString name);
     void removeUser(QString name);
     void addBook(Book book);
     void removeBook(int bookId);

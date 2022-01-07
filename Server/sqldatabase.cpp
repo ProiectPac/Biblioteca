@@ -42,6 +42,24 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
             return User();
     return User();
 }
+
+User SQLDataBase::findUser(QString name)
+{
+    QSqlQuery query;
+    query.prepare("SELECT name FROM users WHERE name=?");
+    query.addBindValue(name);
+    if(!query.exec())
+        qWarning() << "ERROR: " << query.lastError().text();
+    else
+        if(query.first())
+        {
+            User foundUser(name,0);
+            return foundUser;
+        }
+        else
+            return User();
+    return User();
+}
 void SQLDataBase::removeUser(QString name)
 {
     QSqlQuery query;

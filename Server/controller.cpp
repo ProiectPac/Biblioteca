@@ -2,14 +2,14 @@
 
 Controller::Commands Controller::interpret(const std::string &message)
 {
-    if(message=="findUser")
-        return Commands::FindUser;
+    if(message=="login")
+        return Commands::Login;
 
-    if(message=="addUser")
-        return Commands::AddUser;
+    if(message=="registerAccount")
+        return Commands::RegisterAccount;
 
-    if(message=="removeUser")
-        return Commands::RemoveUser;
+    if(message=="deleteAccount")
+        return Commands::DeleteAccount;
 
     if(message=="updateUserPassword")
         return Commands::UpdateUserPassword;
@@ -50,7 +50,7 @@ Controller::Commands Controller::interpret(const std::string &message)
     return Commands::None;
 }
 
-void Controller::findUser(std::vector<std::string> message)
+void Controller::login(std::vector<std::string> message)
 {
     if(message.size()==1)
     {
@@ -82,6 +82,52 @@ void Controller::findUser(std::vector<std::string> message)
             const int len = 512;
             char buffer[len]="User found";
             client->Send(buffer,len);
+            loggedUser = user;
+        }
+    }
+    else
+    {
+        const int len = 512;
+        char buffer[len]="Too many parameters";
+        client->Send(buffer,len);
+    }
+}
+
+void Controller::registerAccount(std::vector<std::string> message)
+{
+    if(message.size()==1)
+    {
+        const int len = 512;
+        char buffer[len]="Username/Password can't be empty";
+        client->Send(buffer,len);
+        return;
+    }
+
+    if(message.size()==2)
+    {
+        const int len = 512;
+        char buffer[len]="Password can't be empty";
+        client->Send(buffer,len);
+        return;
+    }
+    if(message.size()==3)
+    {
+        auto user = dataBase.findUser(QString::fromStdString(message[1]));
+        if(user.getUserName()=="")
+        {
+            user.setUserName(QString::fromStdString(message[1]));
+            user.setPasswordHash(QString::fromStdString(message[2]).toUInt());
+            dataBase.addUser(user);
+            loggedUser = user;
+            const int len = 512;
+            char buffer[len]="Registration went succesfuly";
+            client->Send(buffer,len);
+        }
+        else
+        {
+            const int len = 512;
+            char buffer[len]="Username must be unique. Try another one!";
+            client->Send(buffer,len);
         }
     }
     else
@@ -109,14 +155,15 @@ void Controller::receiveComand()
 
     switch(interpret(message[0]))
     {
-    case Controller::Commands::FindUser:
-        findUser(message);
+    case Controller::Commands::Login:
+        login(message);
         break;
 
-    case Controller::Commands::AddUser:
+    case Controller::Commands::RegisterAccount:
+        registerAccount(message);
         break;
 
-    case Controller::Commands::RemoveUser:
+    case Controller::Commands::DeleteAccount:
         break;
 
     case Controller::Commands::UpdateUserPassword:

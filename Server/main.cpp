@@ -4,7 +4,7 @@
 #include "book.h"
 #include "user.h"
 #include <string.h>
-#include "controler.h"
+#include "controller.h"
 #include <QString>
 #include <thread>
 
@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     connectionsSocket.Listen(27015);
     while(true)
     {       
-       std::thread clientThread(Controler::run,connectionsSocket.Accept());
+       std::thread clientThread(Controller::run,connectionsSocket.Accept());
        clientThread.detach();
     }
     return a.exec();
