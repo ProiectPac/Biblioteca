@@ -156,12 +156,39 @@ void Controller::updateUserPassword(std::vector<std::string> message)
             client->Send(buffer,len);
             return;
         }
+        else if(message.size()==2)
+        {
+            loggedUser.setPasswordHash(QString::fromStdString(message[2]).toUInt());
+            QString buffer = loggedUser.getUserName() + " has changed password succesfully";
+            buffer.resize(512);
+            client->Send(buffer.data(),buffer.size());
+        }
         else
         {
             const int len = 512;
             char buffer[len]="Too many parameters";
             client->Send(buffer,len);
         }
+    }
+}
+
+void Controller::deleteAccount(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    else
+    {
+        QString buffer = loggedUser.getUserName() + " has deleted his account!";
+        buffer.resize(512);
+        client->Send(buffer.data(),buffer.size());
+        dataBase.removeUser(loggedUser.getUserName());
+        loggedUser=User();
+        return;
     }
 }
 
@@ -191,9 +218,11 @@ void Controller::receiveComand()
         break;
 
     case Controller::Commands::DeleteAccount:
+        deleteAccount(message);
         break;
 
     case Controller::Commands::UpdateUserPassword:
+        updateUserPassword(message);
         break;
 
     case Controller::Commands::AddBook:
