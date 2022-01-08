@@ -224,6 +224,7 @@ void Controller::getBook(std::vector<std::string> message)
     Book searchedBook = dataBase.getBook(QString::fromStdString(message[1]).toInt());
     std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString();
     const int len = 512;
+    bookString.resize(len);
     client->Send((void*)bookString.c_str(),len);
 }
 
@@ -239,7 +240,31 @@ void Controller::getBorrowedBook(std::vector<std::string>message)
     Book searchedBook = dataBase.getBorrowedBook(QString::fromStdString(message[1]).toInt(),loggedUser.getUserName());
     std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString() + " " + QString::number(searchedBook.getRemainingDays()).toStdString();
     const int len = 512;
+    bookString.resize(len);
     client->Send((void*)bookString.c_str(),len);
+}
+
+void Controller::BorrowBook(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    if(message.size()!=2)
+    {
+        const int len = 512;
+        char buffer[len]="Wrong number of parameters!";
+        client->Send(buffer,len);
+        return;
+    }
+    auto error = dataBase.borrowBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
+    const int len = 512;
+    error.resize(len);
+    client->Send((void*) error.c_str(),len);
+    return;
 }
 void Controller::removeBook(std::vector<std::string> message)
 {

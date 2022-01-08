@@ -44,7 +44,8 @@ private:
     void addBook(std::vector<std::string>message);
     void removeBook(std::vector<std::string>message);
     void getBook(std::vector<std::string>message);
-
+    void getBorrowedBook(std::vector<std::string>message);
+    void BorrowBook(std::vector<std::string>message);
     void receiveComand();
     Controller() = default;
 public:

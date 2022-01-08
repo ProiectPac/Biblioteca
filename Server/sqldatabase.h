@@ -23,7 +23,7 @@ public:
     std::vector<Book> getAvailableBooks(int pageNumber);
     Book getBook(int id);
     void updateUserPassword(QString userName, unsigned int newPasswordHash);
-    void borrowBook(QString userName, int bookId);
+    std::string borrowBook(QString userName, int bookId);
     void returnBook(QString userName, int bookId);
     std::vector<Book> getBorrowedBooks(int pageNumber, QString userName);
     Book getBorrowedBook(int id,QString userName);

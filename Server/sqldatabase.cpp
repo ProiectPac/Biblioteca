@@ -142,7 +142,7 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
         qWarning() << "ERROR: " << query.lastError().text();
 }
 
-void SQLDataBase::borrowBook(QString userName, int bookID)
+std::string SQLDataBase::borrowBook(QString userName, int bookID)
 {
     /*if(getBorrowedBooks(0,userName).size()>=5)
     {
@@ -155,14 +155,12 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
         if(book.getRemainingDays()==0)
         {
             QString message= "You have to return the borrowed book that's past the return limit!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
         if(book.getID()==bookID)
         {
             QString message= "You cannot borrow the same book twice!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
     }
     int booksCount=0;
@@ -179,8 +177,7 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
         if(booksCountQuery.value(0)==0)
         {
             QString message= "There are no books left to borrow!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
     }
     QSqlQuery insertQuery;
@@ -195,6 +192,7 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
     updateQuery.addBindValue(bookID);
     if(!updateQuery.exec())
         qWarning() << "ERROR: " << updateQuery.lastError().text();
+    return "Book borrowewd succesfully!";
 }
 
 void SQLDataBase::returnBook(QString userName, int bookID)
