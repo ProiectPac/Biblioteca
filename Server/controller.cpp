@@ -227,6 +227,29 @@ void Controller::getBook(std::vector<std::string> message)
     client->Send((void*)bookString.c_str(),len);
 }
 
+void Controller::removeBook(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    if(dataBase.getBook(QString::fromStdString(message[1]).toInt()).getTitle() == "")
+    {
+        const int len = 512;
+        char buffer[len]="Book doesn't exist";
+        client->Send(buffer,len);
+        return;
+    }
+    dataBase.removeBook(QString::fromStdString(message[1]).toInt());
+    const int len = 512;
+    char buffer[len]="Book has been deleted succesfully!";
+    client->Send(buffer,len);
+
+}
+
 void Controller::receiveComand()
 {
     std::vector<std::string>message;

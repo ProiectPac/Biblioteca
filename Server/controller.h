@@ -43,6 +43,7 @@ private:
     void addBook(std::vector<std::string>message);
     void deleteAccount(std::vector<std::string>message);
     void getBook(std::vector<std::string>message);
+    void removeBook(std::vector<std::string>message);
     void receiveComand();
     Controller() = default;
 public:
