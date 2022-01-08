@@ -49,6 +49,8 @@ private:
     void getBorrowedBook(std::vector<std::string>message);
     void borrowBook(std::vector<std::string>message);
     void returnBook(std::vector<std::string>message);
+    void searchAvailableBooks(std::vector<std::string> message);
+    void searchBorrowedBooks(std::vector<std::string> message);
     void logOut(std::vector<std::string> message);
     void receiveComand();
     Controller() = default;

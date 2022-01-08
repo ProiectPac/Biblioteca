@@ -351,6 +351,65 @@ void Controller::searchAvailableBooks(std::vector<std::string> message)
 
 }
 
+void Controller::searchBorrowedBooks(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+
+    if(message.size()!=5)
+    {
+        const int len = 512;
+        char buffer[len]="Wrong number of parameters!";
+        client->Send(buffer,len);
+        return;
+    }
+
+    static int lastPage;
+    static QString staticName;
+    static QString staticAuthor;
+    static QString staticISBN;
+
+    if(staticName.toStdString()!=message[1])
+    {
+        staticName = QString::fromStdString(message[1]);
+        lastPage=0;
+    }
+    if(staticAuthor.toStdString()!=message[2])
+    {
+        staticAuthor = QString::fromStdString(message[2]);
+        lastPage=0;
+    }
+    if(staticISBN.toStdString()!=message[3])
+    {
+        staticISBN = QString::fromStdString(message[3]);
+        lastPage=0;
+    }
+    for(int index=lastPage;index<QString::fromStdString(message[4]).toInt();index++)
+    {
+        dataBase.searchBorrowedBooks(QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]),index,loggedUser.getUserName());
+    }
+
+    auto borrowedBooks = dataBase.searchBorrowedBooks(QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]),QString::fromStdString(message[4]).toInt(),loggedUser.getUserName());
+
+    const int len = 512;
+    std::string response = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books";
+    response.resize(len);
+    client->Send((void*)response.c_str(),len);
+
+    for(auto& book:borrowedBooks)
+    {
+        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString();
+        const int len = 512;
+        bookString.resize(len);
+        client->Send((void*)bookString.c_str(),len);
+    }
+}
+
 void Controller::logOut(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
@@ -406,14 +465,14 @@ void Controller::getAvailableBooks(std::vector<std::string> message)
         client->Send(buffer,len);
         return;
     }
-    auto availabelBooks = dataBase.getAvailableBooks(QString::fromStdString(message[1]).toInt());
+    auto availableBooks = dataBase.getAvailableBooks(QString::fromStdString(message[1]).toInt());
 
     const int len = 512;
-    std::string response = "Found " + QString::number(availabelBooks.size()).toStdString() + " books";
+    std::string response = "Found " + QString::number(availableBooks.size()).toStdString() + " books";
     response.resize(len);
     client->Send((void*)response.c_str(),len);
 
-    for(auto& book:availabelBooks)
+    for(auto& book:availableBooks)
     {
         std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString();
         const int len = 512;
@@ -438,14 +497,14 @@ void Controller::getBorrowedBooks(std::vector<std::string> message)
         client->Send(buffer,len);
         return;
     }
-    auto availabelBooks = dataBase.getBorrowedBooks(QString::fromStdString(message[1]).toInt(),loggedUser.getUserName());
+    auto borrowedBooks = dataBase.getBorrowedBooks(QString::fromStdString(message[1]).toInt(),loggedUser.getUserName());
 
     const int len = 512;
-    std::string response = "Found " + QString::number(availabelBooks.size()).toStdString() + " books";
+    std::string response = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books";
     response.resize(len);
     client->Send((void*)response.c_str(),len);
 
-    for(auto& book:availabelBooks)
+    for(auto& book:borrowedBooks)
     {
         std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString();
         const int len = 512;
@@ -488,36 +547,47 @@ void Controller::receiveComand()
         break;
 
     case Controller::Commands::AddBook:
+        addBook(message);
         break;
 
     case Controller::Commands::RemoveBook:
+        removeBook(message);
         break;
 
     case Controller::Commands::GetAvailableBooks:
+        getAvailableBooks(message);
         break;
 
     case Controller::Commands::GetBorrowedBooks:
+        getBorrowedBooks(message);
         break;
 
     case Controller::Commands::GetBook:
+        getBook(message);
         break;
 
     case Controller::Commands::GetBorrowedBook:
+        getBorrowedBook(message);
         break;
 
     case Controller::Commands::BorrowBook:
+        borrowBook(message);
         break;
 
     case Controller::Commands::ReturnBook:
+        returnBook(message);
         break;
 
     case Controller::Commands::SearchAvailableBooks:
+        searchAvailableBooks(message);
         break;
 
     case Controller::Commands::SearchBorrowedBooks:
+        searchBorrowedBooks(message);
         break;
 
     case Controller::Commands::LogOut:
+        logOut(message);
         break;
 
     case Controller::Commands::None:
