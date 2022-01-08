@@ -44,6 +44,7 @@ private:
     void addBook(std::vector<std::string>message);
     void removeBook(std::vector<std::string>message);
     void getAvailableBooks(std::vector<std::string>message);
+    void getBorrowedBooks(std::vector<std::string>message);
     void getBook(std::vector<std::string>message);
     void getBorrowedBook(std::vector<std::string>message);
     void borrowBook(std::vector<std::string>message);
