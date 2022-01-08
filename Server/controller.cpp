@@ -330,6 +330,38 @@ void Controller::removeBook(std::vector<std::string> message)
 
 }
 
+void Controller::getAvailableBooks(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    if(message.size()!=2)
+    {
+        const int len = 512;
+        char buffer[len]="Wrong number of parameters!";
+        client->Send(buffer,len);
+        return;
+    }
+    auto availabelBooks = dataBase.getAvailableBooks(QString::fromStdString(message[1]).toInt());
+
+    const int len = 512;
+    std::string response = "Found " + QString::number(availabelBooks.size()).toStdString() + " books";
+    response.resize(len);
+    client->Send((void*)response.c_str(),len);
+
+    for(auto& book:availabelBooks)
+    {
+        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString();
+        const int len = 512;
+        bookString.resize(len);
+        client->Send((void*)bookString.c_str(),len);
+    }
+}
+
 void Controller::receiveComand()
 {
     std::vector<std::string>message;
