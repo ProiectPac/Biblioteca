@@ -290,6 +290,23 @@ void Controller::returnBook(std::vector<std::string> message)
     return;
 
 }
+
+void Controller::logOut(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    const int len = 512;
+    std::string response ="User " + loggedUser.getUserName().toStdString() + " has logged out.";
+    response.resize(len);
+    client->Send((void*)response.c_str(),len);
+
+    loggedUser = User();
+}
 void Controller::removeBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
