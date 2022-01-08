@@ -192,7 +192,7 @@ std::string SQLDataBase::borrowBook(QString userName, int bookID)
     updateQuery.addBindValue(bookID);
     if(!updateQuery.exec())
         qWarning() << "ERROR: " << updateQuery.lastError().text();
-    return "Book borrowewd succesfully!";
+    return "Book borrowed succesfully!";
 }
 
 void SQLDataBase::returnBook(QString userName, int bookID)
