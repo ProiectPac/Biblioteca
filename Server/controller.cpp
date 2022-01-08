@@ -244,7 +244,7 @@ void Controller::getBorrowedBook(std::vector<std::string>message)
     client->Send((void*)bookString.c_str(),len);
 }
 
-void Controller::BorrowBook(std::vector<std::string> message)
+void Controller::borrowBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
@@ -265,6 +265,30 @@ void Controller::BorrowBook(std::vector<std::string> message)
     error.resize(len);
     client->Send((void*) error.c_str(),len);
     return;
+}
+
+void Controller::returnBook(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    if(message.size()!=2)
+    {
+        const int len = 512;
+        char buffer[len]="Wrong number of parameters!";
+        client->Send(buffer,len);
+        return;
+    }
+    dataBase.returnBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
+    const int len = 512;
+    char buffer[len]="Book returned succesfully!";
+    client->Send(buffer,len);
+    return;
+
 }
 void Controller::removeBook(std::vector<std::string> message)
 {
