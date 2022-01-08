@@ -212,6 +212,21 @@ void Controller::deleteAccount(std::vector<std::string> message)
     loggedUser=User();
 }
 
+void Controller::getBook(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName()=="")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    Book searchedBook = dataBase.getBook(QString::fromStdString(message[1]).toInt());
+    std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString();
+    const int len = 512;
+    client->Send((void*)bookString.c_str(),len);
+}
+
 void Controller::receiveComand()
 {
     std::vector<std::string>message;
