@@ -40,6 +40,8 @@ private:
     void login(std::vector<std::string> message);
     void registerAccount(std::vector<std::string> message);
     void updateUserPassword(std::vector<std::string> message);
+    void addBook(std::vector<std::string>message);
+    void deleteAccount(std::vector<std::string>message);
     void receiveComand();
     Controller() = default;
 public:

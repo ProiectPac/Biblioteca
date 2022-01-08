@@ -172,6 +172,30 @@ void Controller::updateUserPassword(std::vector<std::string> message)
     }
 }
 
+void Controller::addBook(std::vector<std::string> message)
+{
+    if(loggedUser.getUserName() == "")
+    {
+        const int len = 512;
+        char buffer[len]="You are not logged in!";
+        client->Send(buffer,len);
+        return;
+    }
+    if(message.size() != 10)
+    {
+        const int len = 512;
+        char buffer[len]="Book was transmitted wrongly!";
+        client->Send(buffer,len);
+        return;
+    }
+    Book newBook(0,QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]).toInt(),QString::fromStdString(message[4]),QString::fromStdString(message[5]),QString::fromStdString(message[6]).toFloat(),QString::fromStdString(message[7]),QString::fromStdString(message[8]),QString::fromStdString(message[9]).toInt());
+    dataBase.addBook(newBook);
+    const int len = 512;
+    char buffer[len]="Book has been added succesfully!";
+    client->Send(buffer,len);
+
+}
+
 void Controller::deleteAccount(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
@@ -181,15 +205,11 @@ void Controller::deleteAccount(std::vector<std::string> message)
         client->Send(buffer,len);
         return;
     }
-    else
-    {
-        QString buffer = loggedUser.getUserName() + " has deleted his account!";
-        buffer.resize(512);
-        client->Send(buffer.data(),buffer.size());
-        dataBase.removeUser(loggedUser.getUserName());
-        loggedUser=User();
-        return;
-    }
+    QString buffer = loggedUser.getUserName() + " has deleted his account!";
+    buffer.resize(512);
+    client->Send(buffer.data(),buffer.size());
+    dataBase.removeUser(loggedUser.getUserName());
+    loggedUser=User();
 }
 
 void Controller::receiveComand()
