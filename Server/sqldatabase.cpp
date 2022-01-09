@@ -493,7 +493,11 @@ int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string
 {
     int l_string_length1 = p_string1.length();
     int l_string_length2 = p_string2.length();
-    int d[l_string_length1+1][l_string_length2+1];
+
+    std::vector<std::vector<int>> d;
+    d.resize(l_string_length1+1);
+    for(auto line:d)
+        line.resize(l_string_length2+1);
 
     int i;
     int j;
