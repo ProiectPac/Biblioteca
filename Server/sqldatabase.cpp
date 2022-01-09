@@ -42,6 +42,24 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
             return User();
     return User();
 }
+
+User SQLDataBase::findUser(QString name)
+{
+    QSqlQuery query;
+    query.prepare("SELECT name FROM users WHERE name=?");
+    query.addBindValue(name);
+    if(!query.exec())
+        qWarning() << "ERROR: " << query.lastError().text();
+    else
+        if(query.first())
+        {
+            User foundUser(name,0);
+            return foundUser;
+        }
+        else
+            return User();
+    return User();
+}
 void SQLDataBase::removeUser(QString name)
 {
     QSqlQuery query;
@@ -124,7 +142,7 @@ void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordH
         qWarning() << "ERROR: " << query.lastError().text();
 }
 
-void SQLDataBase::borrowBook(QString userName, int bookID)
+std::string SQLDataBase::borrowBook(QString userName, int bookID)
 {
     /*if(getBorrowedBooks(0,userName).size()>=5)
     {
@@ -137,14 +155,12 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
         if(book.getRemainingDays()==0)
         {
             QString message= "You have to return the borrowed book that's past the return limit!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
         if(book.getID()==bookID)
         {
             QString message= "You cannot borrow the same book twice!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
     }
     int booksCount=0;
@@ -161,8 +177,7 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
         if(booksCountQuery.value(0)==0)
         {
             QString message= "There are no books left to borrow!";
-            QTextStream(stdout)<<message;
-            return;
+            return message.toStdString();
         }
     }
     QSqlQuery insertQuery;
@@ -177,6 +192,7 @@ void SQLDataBase::borrowBook(QString userName, int bookID)
     updateQuery.addBindValue(bookID);
     if(!updateQuery.exec())
         qWarning() << "ERROR: " << updateQuery.lastError().text();
+    return "Book borrowed succesfully!";
 }
 
 void SQLDataBase::returnBook(QString userName, int bookID)
@@ -477,7 +493,11 @@ int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string
 {
     int l_string_length1 = p_string1.length();
     int l_string_length2 = p_string2.length();
-    int d[l_string_length1+1][l_string_length2+1];
+
+    std::vector<std::vector<int>> d;
+    d.resize(l_string_length1+1);
+    for(auto line:d)
+        line.resize(l_string_length2+1);
 
     int i;
     int j;
