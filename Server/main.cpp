@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     connectionsSocket.Listen(27015);
     while(true)
     {       
-       std::thread clientThread(Controller::run,connectionsSocket.Accept());
+       std::thread clientThread(Controller::run,connectionsSocket.Accept(),connectionsSocket.getLocalKey());
        clientThread.detach();
     }
     return a.exec();
