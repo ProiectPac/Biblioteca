@@ -3,7 +3,6 @@ QT       += core gui sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
-LIBS += -lws2_32
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -17,7 +16,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     newbookdialog.cpp \
-    tcpsocket.cpp \
     treeitem.cpp \
     treemodel.cpp \
     user.cpp
@@ -29,7 +27,6 @@ HEADERS += \
     logindialog.h \
     mainwindow.h \
     newbookdialog.h \
-    tcpsocket.h \
     treeitem.h \
     treemodel.h \
     user.h
@@ -42,4 +39,34 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES +=
+win32: LIBS += -L$$PWD/../Dependencies/OpenSSL/lib/ -llibcrypto
+
+INCLUDEPATH += $$PWD/../Dependencies/OpenSSL/include
+DEPENDPATH += $$PWD/../Dependencies/OpenSSL/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/libcrypto.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/liblibcrypto.a
+
+win32: LIBS += -L$$PWD/../Dependencies/OpenSSL/lib/ -llibssl
+
+INCLUDEPATH += $$PWD/../Dependencies/OpenSSL/include
+DEPENDPATH += $$PWD/../Dependencies/OpenSSL/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/libssl.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/liblibssl.a
+
+win32: LIBS += -L$$PWD/../Dependencies/TCPSocket/lib/ -lTCPSocket
+
+INCLUDEPATH += $$PWD/../Dependencies/TCPSocket/include
+DEPENDPATH += $$PWD/../Dependencies/TCPSocket/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/TCPSocket.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/libTCPSocket.a
+
+win32: LIBS += -L$$PWD/../Dependencies/TCPSocket/lib/ -lTCPSocketRelease
+
+INCLUDEPATH += $$PWD/../Dependencies/TCPSocket/include
+DEPENDPATH += $$PWD/../Dependencies/TCPSocket/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/TCPSocketRelease.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/libTCPSocketRelease.a
