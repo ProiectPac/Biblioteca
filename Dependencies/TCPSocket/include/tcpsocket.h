@@ -25,7 +25,7 @@ public:
     TCPSocket(SOCKET socket);
     ~TCPSocket();
     void ConnectToServer(const std::string&, uint16_t);
-    void Listen(uint16_t port);
+    void Listen(std::string address, uint16_t port);
     void Send(const std::string& message);
     std::string Receive();
     std::pair<SOCKET,std::string> Accept();

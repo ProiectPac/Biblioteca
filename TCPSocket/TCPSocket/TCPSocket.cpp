@@ -79,7 +79,7 @@ void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
     }
 }
 
-void TCPSocket::Listen(uint16_t port)
+void TCPSocket::Listen(std::string address,uint16_t port)
 {
     struct addrinfo* result = nullptr, * ptr = nullptr, hints;
 
@@ -87,7 +87,7 @@ void TCPSocket::Listen(uint16_t port)
     hints.ai_family = AF_INET;			// IPv4
 
     // Resolve the local address and port to be used by the server
-    int iResult = getaddrinfo(NULL, std::to_string(port).c_str(), &hints, &result);
+    int iResult = getaddrinfo(address.c_str(), std::to_string(port).c_str(), &hints, &result);
     if (iResult != 0)
     {
         std::cerr << "getaddrinfo failed: " << iResult;
