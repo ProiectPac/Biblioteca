@@ -148,7 +148,7 @@ std::string TCPSocket::Receive()
     }
     else
     {
-        std::string decryptedMessage = TCPSocket::decrypt(localKey, messageStub);
+        std::string decryptedMessage = TCPSocket::decrypt(localKey, messageStub);        
 
         //Check if there are things left to read
         FD_SET set;
@@ -174,15 +174,20 @@ std::string TCPSocket::Receive()
 
             if (messageStub[messageStub.size() - 1] == ';')
             {
-                messageStub.resize(messageStub.size() - 1);
+                 messageStub.resize(messageStub.size() - 1);
                 decryptedMessage += messageStub;
-                break;
+               break;
             }
             decryptedMessage+=messageStub;
 
             FD_ZERO(&set);
             FD_SET(connectSocket,&set);
             select(0,&set,nullptr,nullptr,&timeOut);
+        }
+
+        if (decryptedMessage[decryptedMessage.size() - 1] == ';')
+        {
+            decryptedMessage.resize(decryptedMessage.size() - 1);
         }
 
         return decryptedMessage;
