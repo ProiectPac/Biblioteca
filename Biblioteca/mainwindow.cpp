@@ -139,7 +139,8 @@ void MainWindow::setUpUI()
 {
     resize(1920, 1080);
 
-    bookContent = new QLabel(this);
+    availableBookContent = new QLabel(this);
+    borrowedBookContent  = new QLabel(this);
 
 
     availableBooksList = new QTreeView(this);
@@ -148,8 +149,8 @@ void MainWindow::setUpUI()
     connect(availableBooksList,&QAbstractItemView::doubleClicked,this,&MainWindow::borrowBook);
     connect(borrowedBooksList,&QAbstractItemView::doubleClicked,this,&MainWindow::returnBook);
 
-    connect(availableBooksList,&QAbstractItemView::clicked,this,&MainWindow::borrowBook);
-    connect(borrowedBooksList,&QAbstractItemView::clicked,this,&MainWindow::returnBook);
+    connect(availableBooksList,&QAbstractItemView::clicked,this,&MainWindow::displayAvailableBook);
+    connect(borrowedBooksList,&QAbstractItemView::clicked,this,&MainWindow::displayBorrowedBook);
 
     QGroupBox* availableBookBox = new QGroupBox(this);
 
@@ -254,10 +255,12 @@ void MainWindow::setUpUI()
 
     borrowedBookBox->setLayout(borrowedBooksLayout);
 
-    layout = new BorderLayout();
-    layout->addWidget(bookContent, BorderLayout::Center);
+    layout = new BorderLayout();    
     layout->addWidget(availableBookBox, BorderLayout::West);
+    layout->addWidget(availableBookContent, BorderLayout::West);
+
     layout->addWidget(borrowedBookBox, BorderLayout::East);
+    layout->addWidget(borrowedBookContent, BorderLayout::East);
 
     QWidget *window = new QWidget();
     window->setLayout(layout);
@@ -273,7 +276,8 @@ MainWindow::~MainWindow()
     delete userMenu;
     delete logOutAction;
     delete deleteUserAction;
-    delete bookContent;
+    delete availableBookContent;
+    delete borrowedBookContent;
     delete availableBooksList;
     delete borrowedBooksList;
     delete layout;
@@ -299,12 +303,28 @@ MainWindow::MainWindow() : QMainWindow()
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
     loginDialog->open();
 
-    m_netwManager = new QNetworkAccessManager(this);
-    connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(slot_netwManagerFinished(QNetworkReply*)));
+    m_netwManager1 = new QNetworkAccessManager(this);
+    connect(m_netwManager1, SIGNAL(finished(QNetworkReply*)), this, SLOT(slot_netwManagerFinished1(QNetworkReply*)));
+
+    m_netwManager2 = new QNetworkAccessManager(this);
+    connect(m_netwManager2, SIGNAL(finished(QNetworkReply*)), this, SLOT(slot_netwManagerFinished2(QNetworkReply*)));
 
 }
 
-void MainWindow::slot_netwManagerFinished(QNetworkReply *reply)
+void MainWindow::slot_netwManagerFinished1(QNetworkReply *reply)
+{
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "Error in" << reply->url() << ":" << reply->errorString();
+        return;
+    }
+
+    QByteArray jpegData = reply->readAll();
+    QPixmap pixmap;
+    pixmap.loadFromData(jpegData);    
+    borrowedBookContent->setPixmap(pixmap.scaled(600,960));
+}
+
+void MainWindow::slot_netwManagerFinished2(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "Error in" << reply->url() << ":" << reply->errorString();
@@ -314,7 +334,7 @@ void MainWindow::slot_netwManagerFinished(QNetworkReply *reply)
     QByteArray jpegData = reply->readAll();
     QPixmap pixmap;
     pixmap.loadFromData(jpegData);
-    bookContent->setPixmap(pixmap);
+    availableBookContent->setPixmap(pixmap.scaled(600,960));
 }
 
 void MainWindow::displayBorrowedBook(const QModelIndex &index)
@@ -323,18 +343,30 @@ void MainWindow::displayBorrowedBook(const QModelIndex &index)
     if(idNode!=nullptr)
     {
         auto string = idNode->data(0).toString();
+        string.erase(string.begin(),string.begin() + 4);
         connectionSocket->Send("getBook "+ string.toStdString());
         auto bookString = connectionSocket->Receive();
         auto words = separate(bookString,' ');
         QUrl URL(QString::fromStdString(words[7]));
         QNetworkRequest request(URL);
-        m_netwManager->get(request);
+        m_netwManager1->get(request);
     }
-
 }
 
 void MainWindow::displayAvailableBook(const QModelIndex &index)
 {
+    auto idNode = ((TreeItem *)index.internalPointer())->child(0);
+    if(idNode!=nullptr)
+    {
+        auto string = idNode->data(0).toString();
+        string.erase(string.begin(),string.begin() + 4);
+        connectionSocket->Send("getBook "+ string.toStdString());
+        auto bookString = connectionSocket->Receive();
+        auto words = separate(bookString,' ');
+        QUrl URL(QString::fromStdString(words[7]));
+        QNetworkRequest request(URL);
+        m_netwManager2->get(request);
+    }
 
 }
 

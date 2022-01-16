@@ -37,15 +37,18 @@ public:
 
     MainWindow();
 public slots:
-    void slot_netwManagerFinished(QNetworkReply *reply);
+    void slot_netwManagerFinished1(QNetworkReply *reply);
+    void slot_netwManagerFinished2(QNetworkReply *reply);
 
 private:
-    QNetworkAccessManager *m_netwManager = nullptr;
+    QNetworkAccessManager *m_netwManager1 = nullptr;
+    QNetworkAccessManager *m_netwManager2 = nullptr;
     QMenuBar* userBar = nullptr;
     QMenu* userMenu = nullptr;
     QAction* logOutAction = nullptr;
     QAction* deleteUserAction = nullptr;
-    QLabel *bookContent = nullptr;
+    QLabel *availableBookContent = nullptr;
+    QLabel *borrowedBookContent =nullptr;
     BorderLayout *layout = nullptr;
     QTreeView* availableBooksList=nullptr;
     QTreeView* borrowedBooksList=nullptr;
@@ -74,8 +77,9 @@ private:
 
     User currentUser;
 
-    void displayBorrowedBook(const QModelIndex &index);
+
     void displayAvailableBook(const QModelIndex &index);
+    void displayBorrowedBook(const QModelIndex &index);
     void setUser(User newUser);
     void setUpUserBar();
     void loginDialogFinished();
