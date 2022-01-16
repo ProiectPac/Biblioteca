@@ -172,9 +172,9 @@ std::string TCPSocket::Receive()
             messageStub.resize(iRecvResult);
             messageStub = decrypt(localKey,messageStub);
 
-            if (messageStub[iRecvResult - 1] == ';')
+            if (messageStub[messageStub.size() - 1] == ';')
             {
-                messageStub.resize(iRecvResult - 1);
+                messageStub.resize(messageStub.size() - 1);
                 decryptedMessage += messageStub;
                 break;
             }
