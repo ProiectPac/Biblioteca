@@ -50,21 +50,36 @@ Controller::Commands Controller::interpret(const std::string &message)
     return Commands::None;
 }
 
+std::vector<std::string> Controller::parametrize(const std::string &message)
+{
+    std::vector<std::string> result;
+
+    int lastPosition = 0;
+    int position = message.find(' ');
+
+    while(position !=std::string::npos)
+    {
+        result.push_back(message.substr(lastPosition,position - lastPosition));
+        lastPosition = position + 1;
+        position = message.find(' ',lastPosition);
+    }
+
+    result.push_back(message.substr(lastPosition,message.size() - lastPosition));
+
+    return result;
+}
+
 void Controller::login(std::vector<std::string> message)
 {
     if(message.size()==1)
     {
-        const int len = 512;
-        char buffer[len]="Username/Password can't be empty";
-        client->Send(buffer,len);
+        client->Send("Username/Password can't be empty");
         return;
     }
 
     if(message.size()==2)
     {
-        const int len = 512;
-        char buffer[len]="Password can't be empty";
-        client->Send(buffer,len);
+        client->Send("Password can't be empty");
         return;
     }
 
@@ -73,23 +88,17 @@ void Controller::login(std::vector<std::string> message)
         auto user = dataBase.findUser(QString::fromStdString(message[1]),QString::fromStdString(message[2]).toUInt());
         if(user.getUserName()=="")
         {
-            const int len = 512;
-            char buffer[len]="UserName/Password combination is not correct!";
-            client->Send(buffer,len);
+            client->Send("UserName/Password combination is not correct!");
         }
         else
         {
-            const int len = 512;
-            char buffer[len]="User found";
-            client->Send(buffer,len);
+            client->Send("Logged in succesfully");
             loggedUser = user;
         }
     }
     else
     {
-        const int len = 512;
-        char buffer[len]="Too many parameters";
-        client->Send(buffer,len);
+        client->Send("Too many parameters");
     }
 }
 
@@ -97,17 +106,13 @@ void Controller::registerAccount(std::vector<std::string> message)
 {
     if(message.size()==1)
     {
-        const int len = 512;
-        char buffer[len]="Username/Password can't be empty";
-        client->Send(buffer,len);
+        client->Send("Username/Password can't be empty");
         return;
     }
 
     if(message.size()==2)
     {
-        const int len = 512;
-        char buffer[len]="Password can't be empty";
-        client->Send(buffer,len);
+        client->Send("Password can't be empty");
         return;
     }
     if(message.size()==3)
@@ -119,22 +124,16 @@ void Controller::registerAccount(std::vector<std::string> message)
             user.setPasswordHash(QString::fromStdString(message[2]).toUInt());
             dataBase.addUser(user);
             loggedUser = user;
-            const int len = 512;
-            char buffer[len]="Registration went succesfuly";
-            client->Send(buffer,len);
+            client->Send("Registration went succesfuly");
         }
         else
         {
-            const int len = 512;
-            char buffer[len]="Username must be unique. Try another one!";
-            client->Send(buffer,len);
+            client->Send("Username must be unique. Try another one!");
         }
     }
     else
     {
-        const int len = 512;
-        char buffer[len]="Too many parameters";
-        client->Send(buffer,len);
+        client->Send("Too many parameters");
     }
 }
 
@@ -142,33 +141,25 @@ void Controller::updateUserPassword(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     else
     {
         if(message.size()==1)
         {
-            const int len = 512;
-            char buffer[len]="Password can't be empty";
-            client->Send(buffer,len);
+            client->Send("Password can't be empty");
             return;
         }
         else if(message.size()==2)
         {
             loggedUser.setPasswordHash(QString::fromStdString(message[1]).toUInt());
             dataBase.updateUserPassword(loggedUser.getUserName(),QString::fromStdString(message[1]).toUInt());
-            QString buffer = loggedUser.getUserName() + " has changed password succesfully";
-            buffer.resize(512);
-            client->Send((void*)buffer.toStdString().c_str(),buffer.size());
+            client->Send(loggedUser.getUserName().toStdString() + " has changed password succesfully");
         }
         else
         {
-            const int len = 512;
-            char buffer[len]="Too many parameters";
-            client->Send(buffer,len);
+            client->Send("Too many parameters");
         }
     }
 }
@@ -177,23 +168,17 @@ void Controller::addBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName() == "")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(message.size() != 10)
     {
-        const int len = 512;
-        char buffer[len]="Book was transmitted wrongly!";
-        client->Send(buffer,len);
+        client->Send("Book was transmitted wrongly!");
         return;
     }
     Book newBook(0,QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]).toInt(),QString::fromStdString(message[4]),QString::fromStdString(message[5]),QString::fromStdString(message[6]).toFloat(),QString::fromStdString(message[7]),QString::fromStdString(message[8]),QString::fromStdString(message[9]).toInt());
     dataBase.addBook(newBook);
-    const int len = 512;
-    char buffer[len]="Book has been added succesfully!";
-    client->Send(buffer,len);
+    client->Send("Book has been added succesfully!");
 
 }
 
@@ -201,14 +186,10 @@ void Controller::deleteAccount(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
-    QString buffer = loggedUser.getUserName() + " has deleted his account!";
-    buffer.resize(512);
-    client->Send((void*)buffer.toStdString().c_str(),buffer.size());
+    client->Send( loggedUser.getUserName().toStdString() + " has deleted his account!");
     dataBase.removeUser(loggedUser.getUserName());
     loggedUser=User();
 }
@@ -217,17 +198,13 @@ void Controller::getBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
 
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
 
@@ -235,32 +212,24 @@ void Controller::getBook(std::vector<std::string> message)
 
     if(searchedBook.getTitle()=="")
     {
-        const int len = 512;
-        char buffer[len]="The book does not exist!";
-        client->Send(buffer,len);
+        client->Send("The book does not exist!");
         return;
     }
     std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString();
-    const int len = 512;
-    bookString.resize(len);
-    client->Send((void*)bookString.c_str(),len);
+    client->Send(bookString);
 }
 
 void Controller::getBorrowedBook(std::vector<std::string>message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
 
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
 
@@ -268,37 +237,27 @@ void Controller::getBorrowedBook(std::vector<std::string>message)
 
     if(searchedBook.getTitle()=="")
     {
-        const int len = 512;
-        char buffer[len]="The book does not exist!";
-        client->Send(buffer,len);
+        client->Send("The book does not exist!");
         return;
     }
     std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString() + " " + QString::number(searchedBook.getRemainingDays()).toStdString();
-    const int len = 512;
-    bookString.resize(len);
-    client->Send((void*)bookString.c_str(),len);
+    client->Send(bookString);
 }
 
 void Controller::borrowBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
     auto error = dataBase.borrowBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
-    const int len = 512;
-    error.resize(len);
-    client->Send((void*) error.c_str(),len);
+    client->Send(error);
     return;
 }
 
@@ -306,41 +265,30 @@ void Controller::returnBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
     dataBase.returnBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
-    const int len = 512;
-    char buffer[len]="Book returned succesfully!";
-    client->Send(buffer,len);
+    client->Send("Book returned succesfully!");
     return;
-
 }
 
 void Controller::searchAvailableBooks(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
 
     if(message.size()!=5)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
 
@@ -371,36 +319,27 @@ void Controller::searchAvailableBooks(std::vector<std::string> message)
 
     auto availableBooks = dataBase.searchAvailableBooks(QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]),QString::fromStdString(message[4]).toInt());
 
-    const int len = 512;
-    std::string response = "Found " + QString::number(availableBooks.size()).toStdString() + " books";
-    response.resize(len);
-    client->Send((void*)response.c_str(),len);
+    std::string booksString = "Found " + QString::number(availableBooks.size()).toStdString() + " books\n";
 
     for(auto& book:availableBooks)
     {
-        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString();
-        const int len = 512;
-        bookString.resize(len);
-        client->Send((void*)bookString.c_str(),len);
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
     }
 
+    client->Send(booksString);
 }
 
 void Controller::searchBorrowedBooks(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
 
     if(message.size()!=5)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
 
@@ -431,33 +370,25 @@ void Controller::searchBorrowedBooks(std::vector<std::string> message)
 
     auto borrowedBooks = dataBase.searchBorrowedBooks(QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]),QString::fromStdString(message[4]).toInt(),loggedUser.getUserName());
 
-    const int len = 512;
-    std::string response = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books";
-    response.resize(len);
-    client->Send((void*)response.c_str(),len);
+    std::string booksString = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books\n";
 
     for(auto& book:borrowedBooks)
     {
-        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString();
-        const int len = 512;
-        bookString.resize(len);
-        client->Send((void*)bookString.c_str(),len);
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
     }
+    client->Send(booksString);
 }
 
 void Controller::logOut(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
-    const int len = 512;
     std::string response ="User " + loggedUser.getUserName().toStdString() + " has logged out.";
-    response.resize(len);
-    client->Send((void*)response.c_str(),len);
+
+    client->Send(response);
 
     loggedUser = User();
 }
@@ -465,22 +396,17 @@ void Controller::removeBook(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(dataBase.getBook(QString::fromStdString(message[1]).toInt()).getTitle() == "")
     {
-        const int len = 512;
-        char buffer[len]="Book doesn't exist";
-        client->Send(buffer,len);
+        client->Send("Book doesn't exist");
         return;
     }
     dataBase.removeBook(QString::fromStdString(message[1]).toInt());
-    const int len = 512;
-    char buffer[len]="Book has been deleted succesfully!";
-    client->Send(buffer,len);
+
+    client->Send("Book has been deleted succesfully!");
 
 }
 
@@ -488,80 +414,54 @@ void Controller::getAvailableBooks(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
     auto availableBooks = dataBase.getAvailableBooks(QString::fromStdString(message[1]).toInt());
 
-    const int len = 512;
-    std::string response = "Found " + QString::number(availableBooks.size()).toStdString() + " books";
-    response.resize(len);
-    client->Send((void*)response.c_str(),len);
+    std::string booksString = "Found " + QString::number(availableBooks.size()).toStdString() + " books\n";
 
     for(auto& book:availableBooks)
     {
-        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString();
-        const int len = 512;
-        bookString.resize(len);
-        client->Send((void*)bookString.c_str(),len);
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
     }
+
+    client->Send(booksString);
 }
 
 void Controller::getBorrowedBooks(std::vector<std::string> message)
 {
     if(loggedUser.getUserName()=="")
     {
-        const int len = 512;
-        char buffer[len]="You are not logged in!";
-        client->Send(buffer,len);
+        client->Send("You are not logged in!");
         return;
     }
     if(message.size()!=2)
     {
-        const int len = 512;
-        char buffer[len]="Wrong number of parameters!";
-        client->Send(buffer,len);
+        client->Send("Wrong number of parameters!");
         return;
     }
     auto borrowedBooks = dataBase.getBorrowedBooks(QString::fromStdString(message[1]).toInt(),loggedUser.getUserName());
 
-    const int len = 512;
-    std::string response = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books";
-    response.resize(len);
-    client->Send((void*)response.c_str(),len);
+    std::string booksString = "Found " + QString::number(borrowedBooks.size()).toStdString() + " books\n";
 
     for(auto& book:borrowedBooks)
     {
-        std::string bookString = QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString();
-        const int len = 512;
-        bookString.resize(len);
-        client->Send((void*)bookString.c_str(),len);
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
+
     }
+
+    client->Send(booksString);
 }
 
 void Controller::receiveComand()
 {
-    std::vector<std::string>message;
-    const int length = 512;
-    char buffer[length];
-    client->Receive(buffer,length);
-    char *pointer = std::strtok(buffer," ");
-
-    while(pointer)
-    {
-        std::string word(pointer);
-        message.push_back(word);
-        pointer=std::strtok(NULL, " ");
-    }
+    std::vector<std::string> message = parametrize(client->Receive());
 
     switch(interpret(message[0]))
     {
@@ -626,18 +526,22 @@ void Controller::receiveComand()
         break;
 
     case Controller::Commands::None:
-        const int len = 512;
-        char buffer[len]="Unkown command";
-        client->Send(buffer,len);
+        client->Send("Unkown command");
         break;
     }
     message.clear();
 }
 
-void Controller::run(SOCKET client)
+void Controller::run(std::pair<SOCKET,std::string> clientData, EVP_PKEY* localKey)
 {
     Controller controller;
-    controller.client = new TCPSocket(client);
+    controller.client = new TCPSocket(clientData.first);
+
+    auto remoteKey = TCPSocket::createPublicKey(clientData.second);
+    controller.client->setRemoteKey(remoteKey);
+
+    controller.client->setLocalKey(localKey);
+
     while(true)
     {
         controller.receiveComand();

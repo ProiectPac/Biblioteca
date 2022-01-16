@@ -6,6 +6,7 @@
 #include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QRandomGenerator64>
 #include <map>
 
 class SQLDataBase
@@ -32,6 +33,7 @@ public:
     std::vector<Book> searchBorrowedBooks(QString name, QString author, QString ISBN, int pageNumber, QString userName);
     static int levenshteinDistance(std::string draft, std::string original);
 
+    QString id;
     class Comp
     {
         QString name,author,ISBN;

@@ -12,7 +12,6 @@ SOURCES += \
         controller.cpp \
         main.cpp \
         sqldatabase.cpp \
-        tcpsocket.cpp \
         user.cpp
 
 # Default rules for deployment.
@@ -26,3 +25,35 @@ HEADERS += \
     sqldatabase.h \
     tcpsocket.h \
     user.h
+
+win32: LIBS += -L$$PWD/../Dependencies/TCPSocket/lib/ -lTCPSocket
+
+INCLUDEPATH += $$PWD/../Dependencies/TCPSocket/include
+DEPENDPATH += $$PWD/../Dependencies/TCPSocket/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/TCPSocket.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/libTCPSocket.a
+
+win32: LIBS += -L$$PWD/../Dependencies/TCPSocket/lib/ -lTCPSocketRelease
+
+INCLUDEPATH += $$PWD/../Dependencies/TCPSocket/include
+DEPENDPATH += $$PWD/../Dependencies/TCPSocket/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/TCPSocketRelease.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/TCPSocket/lib/libTCPSocketRelease.a
+
+win32: LIBS += -L$$PWD/../Dependencies/OpenSSL/lib/ -llibcrypto
+
+INCLUDEPATH += $$PWD/../Dependencies/OpenSSL/include
+DEPENDPATH += $$PWD/../Dependencies/OpenSSL/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/libcrypto.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/liblibcrypto.a
+
+win32: LIBS += -L$$PWD/../Dependencies/OpenSSL/lib/ -llibssl
+
+INCLUDEPATH += $$PWD/../Dependencies/OpenSSL/include
+DEPENDPATH += $$PWD/../Dependencies/OpenSSL/include
+
+win32:!win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/libssl.lib
+else:win32-g++: PRE_TARGETDEPS += $$PWD/../Dependencies/OpenSSL/lib/liblibssl.a

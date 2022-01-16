@@ -32,11 +32,12 @@ private:
         LogOut,
         None
     };
-    User loggedUser;
-
+    User loggedUser;    
     Commands interpret(std::string const& message);
+    std::vector<std::string> parametrize(std::string const& message);
     TCPSocket *client=nullptr;
     SQLDataBase dataBase;
+
     void login(std::vector<std::string> message);
     void registerAccount(std::vector<std::string> message);
     void deleteAccount(std::vector<std::string>message);
@@ -55,7 +56,7 @@ private:
     void receiveComand();
     Controller() = default;
 public:
-    void static run(SOCKET client);
+    void static run(std::pair<SOCKET,std::string> clientData, EVP_PKEY* localKey);
 };
 
 #endif // CONTROLLER_H
