@@ -50,18 +50,18 @@ Controller::Commands Controller::interpret(const std::string &message)
     return Commands::None;
 }
 
-std::vector<std::string> Controller::parametrize(const std::string &message)
+std::vector<std::string> Controller::parametrize(const std::string &message, char separator)
 {
     std::vector<std::string> result;
 
     int lastPosition = 0;
-    int position = message.find(' ');
+    int position = message.find(separator);
 
     while(position !=std::string::npos)
     {
         result.push_back(message.substr(lastPosition,position - lastPosition));
         lastPosition = position + 1;
-        position = message.find(' ',lastPosition);
+        position = message.find(separator,lastPosition);
     }
 
     result.push_back(message.substr(lastPosition,message.size() - lastPosition));
@@ -461,7 +461,7 @@ void Controller::getBorrowedBooks(std::vector<std::string> message)
 
 void Controller::receiveComand()
 {
-    std::vector<std::string> message = parametrize(client->Receive());
+    std::vector<std::string> message = parametrize(client->Receive(),' ');
 
     switch(interpret(message[0]))
     {

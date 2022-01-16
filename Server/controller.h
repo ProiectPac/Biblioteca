@@ -34,7 +34,7 @@ private:
     };
     User loggedUser;    
     Commands interpret(std::string const& message);
-    std::vector<std::string> parametrize(std::string const& message);
+    std::vector<std::string> parametrize(std::string const& message, char separator);
     TCPSocket *client=nullptr;
     SQLDataBase dataBase;
 

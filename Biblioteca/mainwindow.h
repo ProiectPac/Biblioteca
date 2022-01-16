@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include "user.h"
 #include "logindialog.h"
 #include <QErrorMessage>
@@ -63,6 +64,8 @@ private:
 
     QLineEdit* borrowedBooksCurrentPageLineEdit = nullptr;
 
+    TCPSocket connectionSocket;
+
     bool hasError=false;
 
     User currentUser;
@@ -98,6 +101,10 @@ private:
     void borrowedBooksNameLineEditReturnPressed();
     void borrowedBooksISBNLineEditReturnPressed();
     void borrowedBooksAuthorLineEditReturnPressed();
+
+    std::vector<std::string> separate(std::string const& message, char separator);
+    std::vector<Book> stringToAvailableBooksVector(std::string string);
+    std::vector<Book> stringToBorrowedBooksVector(std::string string);
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
