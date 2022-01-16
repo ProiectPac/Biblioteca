@@ -33,7 +33,6 @@ public:
     std::vector<Book> searchBorrowedBooks(QString name, QString author, QString ISBN, int pageNumber, QString userName);
     static int levenshteinDistance(std::string draft, std::string original);
 
-    QString id;
     class Comp
     {
         QString name,author,ISBN;

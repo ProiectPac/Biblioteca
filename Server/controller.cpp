@@ -94,12 +94,14 @@ void Controller::login(std::vector<std::string> message)
         {
             client->Send("Logged in succesfully");
             loggedUser = user;
+            qInfo()<<"User " << user.getUserName()  <<" has logged in.\n";
         }
     }
     else
     {
         client->Send("Too many parameters");
     }
+
 }
 
 void Controller::registerAccount(std::vector<std::string> message)
@@ -125,6 +127,7 @@ void Controller::registerAccount(std::vector<std::string> message)
             dataBase.addUser(user);
             loggedUser = user;
             client->Send("Registration went succesfuly");
+            qInfo()<<"User " << user.getUserName()  <<" has registered.\n";
         }
         else
         {
@@ -156,6 +159,7 @@ void Controller::updateUserPassword(std::vector<std::string> message)
             loggedUser.setPasswordHash(QString::fromStdString(message[1]).toUInt());
             dataBase.updateUserPassword(loggedUser.getUserName(),QString::fromStdString(message[1]).toUInt());
             client->Send(loggedUser.getUserName().toStdString() + " has changed password succesfully");
+            qInfo()<<"User " << loggedUser.getUserName()  <<" has changed his password.\n";
         }
         else
         {
@@ -179,6 +183,7 @@ void Controller::addBook(std::vector<std::string> message)
     Book newBook(0,QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]).toInt(),QString::fromStdString(message[4]),QString::fromStdString(message[5]),QString::fromStdString(message[6]).toFloat(),QString::fromStdString(message[7]),QString::fromStdString(message[8]),QString::fromStdString(message[9]).toInt());
     dataBase.addBook(newBook);
     client->Send("Book has been added succesfully!");
+    qInfo()<<"User " << loggedUser.getUserName()  <<" added the book " << newBook.getID() <<" (" <<newBook.getTitle() << ")\n";
 
 }
 
@@ -190,6 +195,7 @@ void Controller::deleteAccount(std::vector<std::string> message)
         return;
     }
     client->Send( loggedUser.getUserName().toStdString() + " has deleted his account!");
+    qInfo()<<"User " << loggedUser.getUserName()  <<" has deleted his account.\n";
     dataBase.removeUser(loggedUser.getUserName());
     loggedUser=User();
 }
@@ -256,8 +262,11 @@ void Controller::borrowBook(std::vector<std::string> message)
         client->Send("Wrong number of parameters!");
         return;
     }
-    auto error = dataBase.borrowBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
+    int borrowedBookId=QString::fromStdString(message[1]).toInt();
+    auto error = dataBase.borrowBook(loggedUser.getUserName(),borrowedBookId);
     client->Send(error);
+    if(error == "Book borrowed succesfully!")
+        qInfo()<<"User " << loggedUser.getUserName()  <<" borrowed the book " <<borrowedBookId <<"\n";
     return;
 }
 
@@ -273,8 +282,10 @@ void Controller::returnBook(std::vector<std::string> message)
         client->Send("Wrong number of parameters!");
         return;
     }
-    dataBase.returnBook(loggedUser.getUserName(),QString::fromStdString(message[1]).toInt());
+    int returnedBookId=QString::fromStdString(message[1]).toInt();
+    dataBase.returnBook(loggedUser.getUserName(),returnedBookId);
     client->Send("Book returned succesfully!");
+    qInfo()<<"User " << loggedUser.getUserName()  <<" returned the book " <<returnedBookId <<"\n";
     return;
 }
 
@@ -389,8 +400,10 @@ void Controller::logOut(std::vector<std::string> message)
     std::string response ="User " + loggedUser.getUserName().toStdString() + " has logged out.";
 
     client->Send(response);
-
+    qInfo()<<"User " << loggedUser.getUserName() << " has logged out.";
     loggedUser = User();
+
+
 }
 void Controller::removeBook(std::vector<std::string> message)
 {
@@ -404,9 +417,11 @@ void Controller::removeBook(std::vector<std::string> message)
         client->Send("Book doesn't exist");
         return;
     }
-    dataBase.removeBook(QString::fromStdString(message[1]).toInt());
+    int removedBookId =QString::fromStdString(message[1]).toInt();
+    dataBase.removeBook(removedBookId);
 
     client->Send("Book has been deleted succesfully!");
+    qInfo()<<"User " << loggedUser.getUserName()  <<" removed the book " << removedBookId <<"\n";
 
 }
 
@@ -430,7 +445,6 @@ void Controller::getAvailableBooks(std::vector<std::string> message)
     {
         booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
     }
-
     client->Send(booksString);
 }
 
