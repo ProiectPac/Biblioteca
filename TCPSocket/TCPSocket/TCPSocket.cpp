@@ -13,7 +13,7 @@ TCPSocket::TCPSocket()
 
     if (connectSocket == INVALID_SOCKET)
     {
-        std::cerr << "Error at socket: " << WSAGetLastError();
+        throw std::exception("Error at socket: " + WSAGetLastError());
     }
 }
 
@@ -40,7 +40,7 @@ void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
     int iResult = getaddrinfo(address.c_str(), std::to_string(port).c_str(), &hints, &result);
     if (iResult != 0)
     {
-        std::cerr << "getaddrinfo failed: " << iResult;
+        throw std::exception("getaddrinfo failed: " + iResult);
         freeaddrinfo(result);
     }
 
@@ -56,14 +56,14 @@ void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
 
     if (connectSocket == INVALID_SOCKET)
     {
-        std::cerr << "Unable to connect to server!\n";
+        throw std::exception("Unable to connect to server!\n");
     }
     char serverPublicKeyBuffer[PUBLIC_KEY_SIZE];
 
     int iRecvResult = recv(connectSocket, serverPublicKeyBuffer, PUBLIC_KEY_SIZE, 0);
     if (iRecvResult < 0)
     {
-        std::cerr << "receive failed: " << WSAGetLastError();
+        throw std::exception("receive failed: " + WSAGetLastError());
     };
 
     remoteKey = createPublicKey(std::string(serverPublicKeyBuffer));
@@ -75,7 +75,7 @@ void TCPSocket::ConnectToServer(const std::string& address, uint16_t port)
     int iSendResult = send(connectSocket, sessionPublicKey.c_str(), sessionPublicKey.size(), 0);
     if (iSendResult < 0)
     {
-        std::cerr << "send failed: " << WSAGetLastError();
+        throw std::exception("send failed: " + WSAGetLastError());
     }
 }
 
@@ -90,7 +90,7 @@ void TCPSocket::Listen(std::string address,uint16_t port)
     int iResult = getaddrinfo(address.c_str(), std::to_string(port).c_str(), &hints, &result);
     if (iResult != 0)
     {
-        std::cerr << "getaddrinfo failed: " << iResult;
+        throw std::exception("getaddrinfo failed: " + iResult);
     }
 
     // *** Binding the socket ***
@@ -98,7 +98,8 @@ void TCPSocket::Listen(std::string address,uint16_t port)
     iResult = bind(connectSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR)
     {
-        std::cerr << "bind failed with error: " << WSAGetLastError();
+        throw std::exception("bind failed with error: " + WSAGetLastError());
+
         freeaddrinfo(result);
         closesocket(connectSocket);
     }
@@ -107,7 +108,9 @@ void TCPSocket::Listen(std::string address,uint16_t port)
     // *** Listening on the socket ***
     if (listen(connectSocket, SOMAXCONN) == SOCKET_ERROR)
     {
-        std::cerr << "Listen failed with error: " << WSAGetLastError();
+        
+        throw std::exception("Listen failed with error: " + WSAGetLastError());
+
         closesocket(connectSocket);
     }
     else
@@ -129,7 +132,7 @@ void TCPSocket::Send(const std::string& message)
     int iSendResult = send(connectSocket, encryptedMessage.c_str(), encryptedMessage.size(), 0);
     if (iSendResult < 0)
     {
-        std::cerr << "send failed: " << WSAGetLastError();
+        throw std::exception("send failed: " + WSAGetLastError());
     }
 }
 
@@ -141,7 +144,7 @@ std::string TCPSocket::Receive()
     int iRecvResult = recv(connectSocket, (char*)messageStub.c_str(), messageStub.size(), 0);
     if (iRecvResult < 0)
     {
-        std::cerr << "receive failed: " << WSAGetLastError();
+        throw std::exception("receive failed: " + WSAGetLastError());
     }
     else
     {
@@ -163,7 +166,7 @@ std::string TCPSocket::Receive()
             int iRecvResult = recv(connectSocket, (char*)messageStub.c_str(), messageStub.size(), 0);
             if (iRecvResult < 0)
             {
-                std::cerr << "receive failed: " << WSAGetLastError();
+                throw std::exception("receive failed: " + WSAGetLastError());
             }
 
             messageStub.resize(iRecvResult);
@@ -185,7 +188,7 @@ std::pair<SOCKET,std::string> TCPSocket::Accept()
     ClientSocket = accept(connectSocket, NULL, NULL);
     if (ClientSocket == INVALID_SOCKET)
     {
-        std::cerr << "accept failed: " << WSAGetLastError();
+        throw std::exception("accept failed: " + WSAGetLastError());
     }
 
     auto publicKeyBuffer = TCPSocket::extractPublicKey(localKey);
@@ -194,7 +197,7 @@ std::pair<SOCKET,std::string> TCPSocket::Accept()
 
     if (iSendResult < 0)
     {
-        std::cerr << "send failed: " << WSAGetLastError();
+        throw std::exception("send failed: " + WSAGetLastError());
     }
 
     unsigned char sessionPublicKeyBuffer[PUBLIC_KEY_SIZE + 1];
@@ -202,7 +205,7 @@ std::pair<SOCKET,std::string> TCPSocket::Accept()
     int iRecvResult = recv(ClientSocket, (char*)sessionPublicKeyBuffer, PUBLIC_KEY_SIZE, 0);
     if (iRecvResult < 0)
     {
-        std::cerr << "receive failed: " << WSAGetLastError();
+        throw std::exception("receive failed: " + WSAGetLastError());
     };
 
     sessionPublicKeyBuffer[PUBLIC_KEY_SIZE] = '\0';
@@ -241,24 +244,25 @@ std::string TCPSocket::encrypt(EVP_PKEY* key,std::string message)
 {
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(key, NULL);
     if (!ctx)
-        std::cerr << "Error";
+        throw std::exception("Error");
+
 
     if (EVP_PKEY_encrypt_init(ctx) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
     if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     size_t outlen;
     if (EVP_PKEY_encrypt(ctx, NULL, &outlen, (unsigned char*)message.c_str(),message.size()) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     unsigned char *out = (unsigned char*)OPENSSL_malloc(outlen);
 
     if (!out)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     if (EVP_PKEY_encrypt(ctx, out, &outlen, (unsigned char*)message.c_str(),message.size()) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     std::string encryptedMessage;
     encryptedMessage.resize(outlen);
@@ -277,25 +281,25 @@ std::string TCPSocket::decrypt(EVP_PKEY* key, std::string message)
 {
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new(key, NULL);
     if (!ctx)
-        std::cerr << "Error";
+        throw std::exception("Error");
     if (EVP_PKEY_decrypt_init(ctx) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
     if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     /* Determine buffer length */
     size_t outlen;
 
     if (EVP_PKEY_decrypt(ctx, NULL, &outlen, (unsigned char*)message.c_str(),message.size()) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     unsigned char *out = (unsigned char*)OPENSSL_malloc(outlen);
 
     if (!out)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     if (EVP_PKEY_decrypt(ctx, out, &outlen, (unsigned char*)message.c_str(),message.size()) <= 0)
-        std::cerr << "Error";
+        throw std::exception("Error");
 
     std::string decryptedMessage;
     decryptedMessage.resize(outlen);

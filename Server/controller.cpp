@@ -612,9 +612,21 @@ void Controller::run(std::pair<SOCKET,std::string> clientData, EVP_PKEY* localKe
     controller.client->setRemoteKey(remoteKey);
 
     controller.client->setLocalKey(localKey);
-
+    try{
     while(true)
     {
         controller.receiveComand();
+    }
+    }
+    catch(std::exception e)
+    {
+        if(controller.loggedUser.getUserName()!="")
+        {
+            qInfo()<<controller.loggedUser.getUserName() << " has disconnected\n";
+        }
+        else
+        {
+            qInfo()<<"Guest has disconnected\n";
+        }
     }
 }
