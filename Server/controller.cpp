@@ -69,6 +69,25 @@ std::vector<std::string> Controller::parametrize(const std::string &message, cha
     return result;
 }
 
+void Controller::eliminateUnderline(std::string& message)
+{
+    for(auto& character : message)
+    {
+        if(character == '_')
+            character = ' ';
+    }
+}
+
+std::string Controller::addUnderline(std::string message)
+{
+    for(auto& character : message)
+    {
+        if(character == ' ')
+            character = '_';
+    }
+    return message;
+}
+
 void Controller::login(std::vector<std::string> message)
 {
     if(message.size()==1)
@@ -85,6 +104,8 @@ void Controller::login(std::vector<std::string> message)
 
     if(message.size()==3)
     {
+        eliminateUnderline(message[1]);
+
         auto user = dataBase.findUser(QString::fromStdString(message[1]),QString::fromStdString(message[2]).toUInt());
         if(user.getUserName()=="")
         {
@@ -117,6 +138,8 @@ void Controller::registerAccount(std::vector<std::string> message)
     }
     if(message.size()==3)
     {
+        eliminateUnderline(message[1]);
+
         auto user = dataBase.findUser(QString::fromStdString(message[1]));
         if(user.getUserName()=="")
         {
@@ -176,6 +199,9 @@ void Controller::addBook(std::vector<std::string> message)
         client->Send("Book was transmitted wrongly!");
         return;
     }
+
+    eliminateUnderline(message[2]);
+    eliminateUnderline(message[4]);
     Book newBook(0,QString::fromStdString(message[1]),QString::fromStdString(message[2]),QString::fromStdString(message[3]).toInt(),QString::fromStdString(message[4]),QString::fromStdString(message[5]),QString::fromStdString(message[6]).toFloat(),QString::fromStdString(message[7]),QString::fromStdString(message[8]),QString::fromStdString(message[9]).toInt());
     dataBase.addBook(newBook);
     client->Send("Book has been added succesfully!");
@@ -215,7 +241,7 @@ void Controller::getBook(std::vector<std::string> message)
         client->Send("The book does not exist!");
         return;
     }
-    std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString();
+    std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + addUnderline(searchedBook.getAuthor().toStdString()) + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + addUnderline(searchedBook.getTitle().toStdString()) + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString();
     client->Send(bookString);
 }
 
@@ -240,7 +266,7 @@ void Controller::getBorrowedBook(std::vector<std::string>message)
         client->Send("The book does not exist!");
         return;
     }
-    std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + searchedBook.getAuthor().toStdString() + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + searchedBook.getTitle().toStdString() + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString() + " " + QString::number(searchedBook.getRemainingDays()).toStdString();
+    std::string bookString = QString::number(searchedBook.getID()).toStdString() + " " + searchedBook.getISBN().toStdString() + " " + addUnderline(searchedBook.getAuthor().toStdString()) + " " + QString::number(searchedBook.getOriginalPublicationYear()).toStdString() + " " + addUnderline(searchedBook.getTitle().toStdString()) + " " + searchedBook.getLanguage().toStdString() + " " + QString::number(searchedBook.getAverageRating()).toStdString() + " " + searchedBook.getImageURL().toStdString() + " " + searchedBook.getSmallImageURL().toStdString() + " " + QString::number(searchedBook.getBooksCount()).toStdString() + " " + QString::number(searchedBook.getRemainingDays()).toStdString();
     client->Send(bookString);
 }
 
@@ -292,6 +318,18 @@ void Controller::searchAvailableBooks(std::vector<std::string> message)
         return;
     }
 
+    eliminateUnderline(message[1]);
+    eliminateUnderline(message[2]);
+
+    if(message[1] == "`")
+        message[1] = "";
+
+    if(message[2] == "`")
+        message[2] = "";
+
+    if(message[3] == "`")
+        message[3] = "";
+
     static int lastPage;
     static QString staticName;
     static QString staticAuthor;
@@ -323,9 +361,10 @@ void Controller::searchAvailableBooks(std::vector<std::string> message)
 
     for(auto& book:availableBooks)
     {
-        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + addUnderline(book.getAuthor().toStdString()) + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + addUnderline(book.getTitle().toStdString()) + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
     }
 
+    booksString.resize(booksString.size()-1);
     client->Send(booksString);
 }
 
@@ -342,6 +381,18 @@ void Controller::searchBorrowedBooks(std::vector<std::string> message)
         client->Send("Wrong number of parameters!");
         return;
     }
+
+    eliminateUnderline(message[1]);
+    eliminateUnderline(message[2]);
+
+    if(message[1] == "`")
+        message[1] = "";
+
+    if(message[2] == "`")
+        message[2] = "";
+
+    if(message[3] == "`")
+        message[3] = "";
 
     static int lastPage;
     static QString staticName;
@@ -374,8 +425,10 @@ void Controller::searchBorrowedBooks(std::vector<std::string> message)
 
     for(auto& book:borrowedBooks)
     {
-        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + addUnderline(book.getAuthor().toStdString()) + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + addUnderline(book.getTitle().toStdString()) + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
     }
+
+    booksString.resize(booksString.size()-1);
     client->Send(booksString);
 }
 
@@ -428,9 +481,11 @@ void Controller::getAvailableBooks(std::vector<std::string> message)
 
     for(auto& book:availableBooks)
     {
-        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
+
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + addUnderline(book.getAuthor().toStdString()) + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + addUnderline(book.getTitle().toStdString()) + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + '\n';
     }
 
+    booksString.resize(booksString.size()-1);
     client->Send(booksString);
 }
 
@@ -452,10 +507,11 @@ void Controller::getBorrowedBooks(std::vector<std::string> message)
 
     for(auto& book:borrowedBooks)
     {
-        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + book.getAuthor().toStdString() + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + book.getTitle().toStdString() + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
+        booksString += QString::number(book.getID()).toStdString() + " " + book.getISBN().toStdString() + " " + addUnderline(book.getAuthor().toStdString()) + " " + QString::number(book.getOriginalPublicationYear()).toStdString() + " " + addUnderline(book.getTitle().toStdString()) + " " + book.getLanguage().toStdString() + " " + QString::number(book.getAverageRating()).toStdString() + " " + book.getImageURL().toStdString() + " " + book.getSmallImageURL().toStdString() + " " + QString::number(book.getBooksCount()).toStdString() + " " + QString::number(book.getRemainingDays()).toStdString() + '\n';
 
     }
 
+    booksString.resize(booksString.size()-1);
     client->Send(booksString);
 }
 

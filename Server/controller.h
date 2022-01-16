@@ -35,6 +35,9 @@ private:
     User loggedUser;    
     Commands interpret(std::string const& message);
     std::vector<std::string> parametrize(std::string const& message, char separator);
+    void eliminateUnderline(std::string& message);
+    std::string addUnderline(std::string message);
+
     TCPSocket *client=nullptr;
     SQLDataBase dataBase;
 

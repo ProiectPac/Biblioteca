@@ -73,8 +73,8 @@ void SQLDataBase::removeUser(QString name)
 
 void SQLDataBase::addBook(Book book)
 {
-    QSqlQuery query;
-    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url) VALUES(?,?,?,?,?,?,?,?)");
+    QSqlQuery query(dataBase);
+    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count) VALUES(?,?,?,?,?,?,?,?,?)");
     query.addBindValue(book.getISBN());
     query.addBindValue(book.getAuthor());
     query.addBindValue(book.getOriginalPublicationYear());
@@ -83,6 +83,7 @@ void SQLDataBase::addBook(Book book)
     query.addBindValue(book.getAverageRating());
     query.addBindValue(book.getImageURL());
     query.addBindValue(book.getSmallImageURL());
+    query.addBindValue(book.getBooksCount());
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
@@ -233,7 +234,7 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
 {
     std::vector<Book>previousBooks;
     QSqlQuery booksQuery(dataBase);
-    QSqlQuery createTable("CREATE TABLE borrowed_books (id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days, PRIMARY KEY(id));");
+    QSqlQuery createTable("CREATE TABLE borrowed_books (id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days, PRIMARY KEY(id));",dataBase);
     QSqlQuery insert(dataBase);
 
     insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,user_book.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
@@ -498,7 +499,7 @@ int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string
 
     std::vector<std::vector<int>> d;
     d.resize(l_string_length1+1);
-    for(auto line:d)
+    for(auto& line:d)
         line.resize(l_string_length2+1);
 
     int i;

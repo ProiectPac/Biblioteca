@@ -64,7 +64,7 @@ private:
 
     QLineEdit* borrowedBooksCurrentPageLineEdit = nullptr;
 
-    TCPSocket connectionSocket;
+    TCPSocket* connectionSocket = nullptr;
 
     bool hasError=false;
 
@@ -105,6 +105,9 @@ private:
     std::vector<std::string> separate(std::string const& message, char separator);
     std::vector<Book> stringToAvailableBooksVector(std::string string);
     std::vector<Book> stringToBorrowedBooksVector(std::string string);
+
+    void eliminateUnderline(std::string& message);
+    std::string addUnderline(std::string message);
 
     int availableBooksCurrentPage=0;
     int borrowedBooksCurrentPage=0;
