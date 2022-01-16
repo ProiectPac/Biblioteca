@@ -20,6 +20,7 @@
 #include "treeitem.h"
 #include "deletebookdialog.h"
 #include "tcpsocket.h"
+#include <QtNetwork>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,13 +36,16 @@ public:
 
 
     MainWindow();
+public slots:
+    void slot_netwManagerFinished(QNetworkReply *reply);
 
 private:
+    QNetworkAccessManager *m_netwManager = nullptr;
     QMenuBar* userBar = nullptr;
     QMenu* userMenu = nullptr;
     QAction* logOutAction = nullptr;
     QAction* deleteUserAction = nullptr;
-    QTextBrowser *bookContent = nullptr;
+    QLabel *bookContent = nullptr;
     BorderLayout *layout = nullptr;
     QTreeView* availableBooksList=nullptr;
     QTreeView* borrowedBooksList=nullptr;
@@ -70,6 +74,8 @@ private:
 
     User currentUser;
 
+    void displayBorrowedBook(const QModelIndex &index);
+    void displayAvailableBook(const QModelIndex &index);
     void setUser(User newUser);
     void setUpUserBar();
     void loginDialogFinished();
