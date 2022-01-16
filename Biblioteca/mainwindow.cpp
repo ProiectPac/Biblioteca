@@ -51,87 +51,72 @@ void MainWindow::loginDialogFinished()
 
     if(loginDialog->getAction()!=LoginDialog::Actions::Nothing)
     {
-        if(userCredentials.first=="" && userCredentials.second==0)
+        if(loginDialog->getAction()==LoginDialog::Actions::Login)
         {
-            QString message= "UserName and Password can't be empty";
-            errorMessage->showMessage(message);
+            auto passwordHash = QString::number(userCredentials.second).toStdString();
 
-            delete loginDialog;
-            loginDialog = new LoginDialog(this);
-            connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-            connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
-            hasError=true;
-
-        }
-        else
-        {
-            if(userCredentials.first=="")
+            connectionSocket->Send("login " + addUnderline(userCredentials.first.toStdString()) + " " + passwordHash);
+            std::string response = connectionSocket->Receive();
+            if(response=="Logged in succesfully")
             {
-                QString message= "UserName can't be empty";
-                errorMessage->showMessage(message);
-
-                delete loginDialog;
-                loginDialog = new LoginDialog(this);
-                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
-
-                hasError=true;
-            }
-            if(userCredentials.second==0)
-            {
-                QString message= "Password can't be empty";
-
-                delete loginDialog;
-                loginDialog = new LoginDialog(this);
-                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
-
-                errorMessage->showMessage(message);
-                hasError=true;
-            }
-        }
-        if(hasError==false)
-        {
-            if(loginDialog->getAction()==LoginDialog::Actions::Login)
-            {
-                auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
-                if(foundUser.getUserName()!="")
-                {
-                    setUser(foundUser);
-
-                    availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
-                    borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
-
-                    availableBooksList->setModel(availableBooksModel);
-                    borrowedBooksList->setModel(borrowedBooksModel);
-                }
-                else
-                {
-                    QString message= "UserName/Password combination is not correct.";
-                    QErrorMessage *errorMessage = QErrorMessage::qtHandler();
-
-                    delete loginDialog;
-                    loginDialog = new LoginDialog(this);
-                    connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
-                    connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
-
-                    errorMessage->showMessage(message);
-                    hasError=true;
-                }
-            }
-            else if(loginDialog->getAction()==LoginDialog::Actions::Register)
-            {
-                dataBase.addUser(User(userCredentials.first, userCredentials.second));
-                auto foundUser = dataBase.findUser(userCredentials.first, userCredentials.second);
+                auto foundUser = User(userCredentials.first, 0);
                 setUser(foundUser);
 
-                availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
-                borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+                connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+                availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
+                connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+                borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
 
                 availableBooksList->setModel(availableBooksModel);
                 borrowedBooksList->setModel(borrowedBooksModel);
             }
+            else
+            {
+                QString message= QString::fromStdString(response);
+                QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+
+                delete loginDialog;
+                loginDialog = new LoginDialog(this);
+                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
+
+                errorMessage->showMessage(message);
+                hasError=true;
+            }
         }
+        else if(loginDialog->getAction()==LoginDialog::Actions::Register)
+        {
+            connectionSocket->Send("registerAccount " + addUnderline(userCredentials.first.toStdString()) +" "+QString::number(userCredentials.second).toStdString());
+            std::string response = connectionSocket->Receive();
+            if(response=="Registration went succesfuly")
+            {
+                auto foundUser = User(userCredentials.first, 0);
+                setUser(foundUser);
+
+                connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+                availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
+                connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+                borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
+
+                availableBooksList->setModel(availableBooksModel);
+                borrowedBooksList->setModel(borrowedBooksModel);
+            }
+            else
+            {
+                QString message= QString::fromStdString(response);
+                QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+
+                delete loginDialog;
+                loginDialog = new LoginDialog(this);
+                connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
+                connect(errorMessage,&QErrorMessage::finished, loginDialog,&LoginDialog::open);
+
+                errorMessage->showMessage(message);
+                hasError=true;
+            }
+
+        }
+
     }
     else
         this->close();
@@ -140,7 +125,13 @@ void MainWindow::loginDialogFinished()
 void MainWindow::deleteBookDialogFinished()
 {
     int bookId = deleteBookDialog->getBookID();
-    dataBase.removeBook(bookId);
+    connectionSocket->Send("removeBook "+QString::number(bookId).toStdString());
+    auto response = connectionSocket->Receive();
+    QMessageBox messageBox;
+    messageBox.setText(QString::fromStdString(response));
+    messageBox.setWindowTitle("Delete book Response");
+    messageBox.open();
+
 }
 
 void MainWindow::setUpUI()
@@ -284,6 +275,7 @@ MainWindow::~MainWindow()
     delete availableBooksList;
     delete borrowedBooksList;
     delete layout;
+    delete connectionSocket;
 }
 
 void MainWindow::setUser(User newUser)
@@ -295,6 +287,10 @@ MainWindow::MainWindow() : QMainWindow()
 {
     setUpUI();
     setUpUserBar();
+    TCPSocket::startUp();
+    connectionSocket = new TCPSocket();
+
+    connectionSocket->ConnectToServer("localhost", 27015);
 
     delete loginDialog;
     loginDialog = new LoginDialog(this);
@@ -310,27 +306,48 @@ void MainWindow::borrowBook(const QModelIndex &index)
     {
         auto string = idNode->data(0).toString();
         string.erase(string.begin(),string.begin()+4);
+        connectionSocket->Send("borrowBook " + string.toStdString());
+        std::string response = connectionSocket->Receive();
+        if(response!="Book borrowed succesfully!")
+        {
+            QString message= QString::fromStdString(response);
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
 
-        dataBase.borrowBook(currentUser.getUserName(), string.toInt());
+            errorMessage->showMessage(message);
+        }
     }
 
     if(availableBooksNameLineEdit->text()=="" && availableBooksAuthorLineEdit->text()=="" && availableBooksISBNLineEdit->text()=="")
     {
         delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+        connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
     else
     {
-        dataBase.searchAvailableBooks("", "", "", 0);
+        connectionSocket->Send("searchAvailableBooks ` ` ` 0");
+        connectionSocket->Receive();
 
-        for(int index=0;index<=availableBooksLastPage; ++index)
-        {
-            dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), index);
-        }
+        std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
         delete availableBooksModel;
-        availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+        connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
 
@@ -338,18 +355,33 @@ void MainWindow::borrowBook(const QModelIndex &index)
     {
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
     else
     {
-        dataBase.searchBorrowedBooks("", "", "", 0, currentUser.getUserName());
-        for(int index=0;index<=borrowedBooksLastPage; ++index)
-        {
-            dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), index, currentUser.getUserName());
-        }
+        connectionSocket->Send("searchAvailableBooks ` ` ` 0");
+        connectionSocket->Receive();
+
+        std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
         delete borrowedBooksModel;
-        borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), true);
+        connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
 }
@@ -361,8 +393,15 @@ void MainWindow::returnBook(const QModelIndex &index)
     {
         auto string = idNode->data(0).toString();
         string.erase(string.begin(),string.begin()+4);
+        connectionSocket->Send("returnBook " + string.toStdString());
+        std::string response = connectionSocket->Receive();
+        if(response!="Book returned succesfully!")
+        {
+            QString message= QString::fromStdString(response);
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
 
-        dataBase.returnBook(currentUser.getUserName(), string.toInt());
+            errorMessage->showMessage(message);
+        }
     }
 
 
@@ -370,19 +409,35 @@ void MainWindow::returnBook(const QModelIndex &index)
     {
         delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+        connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
+
         availableBooksList->setModel(availableBooksModel);
     }
     else
     {
-        dataBase.searchAvailableBooks("", "", "", 0);
+        connectionSocket->Send("searchAvailableBooks ` ` ` 0");
+        connectionSocket->Receive();
 
-        for(int index=0;index<=availableBooksLastPage; ++index)
-        {
-            dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), index);
-        }
         delete availableBooksModel;
-        availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+        std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete availableBooksModel;
+        connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
 
@@ -390,18 +445,34 @@ void MainWindow::returnBook(const QModelIndex &index)
     {
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
     else
     {
-        dataBase.searchBorrowedBooks("", "", "", 0, currentUser.getUserName());
-        for(int index=0; index<=borrowedBooksLastPage; ++index)
-        {
-            dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), index, currentUser.getUserName());
-        }
+        connectionSocket->Send("searchAvailableBooks ` ` ` 0");
+        connectionSocket->Receive();
+
         delete borrowedBooksModel;
-        borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), true);
+        std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete borrowedBooksModel;
+        connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
 }
@@ -411,6 +482,8 @@ void MainWindow::logOut()
 {
     availableBooksCurrentPage=0;
     borrowedBooksCurrentPage=0;
+    connectionSocket->Send("logOut");
+    connectionSocket->Receive();
     delete loginDialog;
     loginDialog = new LoginDialog(this);
     connect(loginDialog,&LoginDialog::finished,this,&MainWindow::loginDialogFinished);
@@ -419,7 +492,8 @@ void MainWindow::logOut()
 
 void MainWindow::deleteCurrentUser()
 {
-    dataBase.removeUser(currentUser.getUserName());
+    connectionSocket->Send("deleteAccount");
+    connectionSocket->Receive();
     logOut();
 }
 
@@ -428,13 +502,16 @@ void MainWindow::changeCurrentUserPassword()
     QInputDialog *passwordDialog = new QInputDialog;
     passwordDialog->setWindowTitle("Change Password");
     passwordDialog->setLabelText("New Password");
+    passwordDialog->exec();
+
     QInputDialog *repeatPasswordDialog = new QInputDialog;
     repeatPasswordDialog->setWindowTitle("Change Password");
     repeatPasswordDialog->setLabelText("Repeat Password");
-    passwordDialog->exec();
+
     repeatPasswordDialog->exec();
     QString newPassword=passwordDialog->textValue();
     QString repeatPassword=repeatPasswordDialog->textValue();
+
     if(passwordDialog->result()==QDialog::Accepted && repeatPasswordDialog->result()==QDialog::Accepted)
     {
         if(newPassword==""||repeatPassword=="")
@@ -452,7 +529,8 @@ void MainWindow::changeCurrentUserPassword()
         else
         {
             currentUser.setPasswordHash(LoginDialog::FNVHash(newPassword));
-            dataBase.updateUserPassword(currentUser.getUserName(), currentUser.getPasswordHash());
+            connectionSocket->Send("updateUserPassword " + QString::number(currentUser.getPasswordHash()).toStdString());
+            connectionSocket->Receive();
         }
     }
     delete passwordDialog;
@@ -475,16 +553,34 @@ void MainWindow::nextAvailableBooksButtonOnClick()
         availableBooksCurrentPageLineEdit->setText(QString::number(availableBooksCurrentPage));
         delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+        connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
+
         availableBooksList->setModel(availableBooksModel);
     }
     else
     {
         availableBooksCurrentPage++;
         availableBooksCurrentPageLineEdit->setText(QString::number(availableBooksCurrentPage));
-        delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+        std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete availableBooksModel;
+        connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
 }
@@ -500,16 +596,33 @@ void MainWindow::previousAvailableBooksButtonOnClick()
         availableBooksCurrentPageLineEdit->setText(QString::number(availableBooksCurrentPage));
         delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+        connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
     else
     {
         availableBooksCurrentPage--;
         availableBooksCurrentPageLineEdit->setText(QString::number(availableBooksCurrentPage));
-        delete availableBooksModel;
 
-        availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+        std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete availableBooksModel;
+        connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+        availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
         availableBooksList->setModel(availableBooksModel);
     }
 }
@@ -522,7 +635,8 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
         borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
     else
@@ -531,7 +645,24 @@ void MainWindow::nextBorrowedBooksButtonOnClick()
         borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+        std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete borrowedBooksModel;
+        connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
 }
@@ -546,7 +677,8 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
         borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+        connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
     else
@@ -555,7 +687,24 @@ void MainWindow::previousBorrowedBooksButtonOnClick()
         borrowedBooksCurrentPageLineEdit->setText(QString::number(borrowedBooksCurrentPage));
         delete borrowedBooksModel;
 
-        borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+        std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+        if(title == "")
+            title ="`";
+
+        std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+        if(author == "")
+            author ="`";
+
+        std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+        if(isbn == "")
+            isbn ="`";
+
+        delete borrowedBooksModel;
+        connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+        borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
         borrowedBooksList->setModel(borrowedBooksModel);
     }
 }
@@ -572,22 +721,37 @@ void MainWindow::availableBooksCurrentPageChanged(QString text)
             availableBooksCurrentPage = currentPage;
             delete availableBooksModel;
 
-            availableBooksModel = new TreeModel(dataBase.getAvailableBooks(availableBooksCurrentPage),false);
+            connectionSocket->Send("getAvailableBooks " + QString::number(availableBooksCurrentPage).toStdString());
+            availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
+
             availableBooksList->setModel(availableBooksModel);
         }
         else
         {
-            for(int index=availableBooksLastPage+1;index<=currentPage;++index)
-            {
-                dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), index);
-            }
-            delete availableBooksModel;
+
             availableBooksCurrentPage=currentPage;
             if(availableBooksLastPage<currentPage)
             {
                 availableBooksLastPage=currentPage;
             }
-            availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+            std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+            if(title == "")
+                title ="`";
+
+            std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+            if(author == "")
+                author ="`";
+
+            std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+            if(isbn == "")
+                isbn ="`";
+
+            delete availableBooksModel;
+            connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+            availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
             availableBooksList->setModel(availableBooksModel);
         }
     }
@@ -604,15 +768,12 @@ void MainWindow::borrowedBooksCurrentPageChanged(QString text)
             borrowedBooksCurrentPage=currentPage;
             delete borrowedBooksModel;
 
-            borrowedBooksModel = new TreeModel(dataBase.getBorrowedBooks(borrowedBooksCurrentPage,currentUser.getUserName()),true);
+            connectionSocket->Send("getBorrowedBooks " + QString::number(borrowedBooksCurrentPage).toStdString());
+            borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()),true);
             borrowedBooksList->setModel(borrowedBooksModel);
         }
         else
         {
-            for(int index=borrowedBooksLastPage;index<=currentPage;++index)
-            {
-                dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), index, currentUser.getUserName());
-            }
             delete borrowedBooksModel;
             borrowedBooksCurrentPage = currentPage;
             if(borrowedBooksLastPage< borrowedBooksCurrentPage)
@@ -620,7 +781,24 @@ void MainWindow::borrowedBooksCurrentPageChanged(QString text)
                 borrowedBooksLastPage = borrowedBooksCurrentPage;
             }
 
-            borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+            std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+            if(title == "")
+                title ="`";
+
+            std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+            if(author == "")
+                author ="`";
+
+            std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+            if(isbn == "")
+                isbn ="`";
+
+            delete borrowedBooksModel;
+            connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+            borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
             borrowedBooksList->setModel(borrowedBooksModel);
         }
     }
@@ -641,7 +819,16 @@ void MainWindow::addBookFinished()
     if(newBookDialog->result() == QDialog::Accepted)
     {
         Book newBook = newBookDialog->getBook();
-        dataBase.addBook(newBook);
+        std::string bookString = newBook.getISBN().toStdString() + " " + addUnderline(newBook.getAuthor().toStdString()) + " " + QString::number(newBook.getOriginalPublicationYear()).toStdString() + " " + addUnderline(newBook.getTitle().toStdString()) + " " + newBook.getLanguage().toStdString() + " " + QString::number(newBook.getAverageRating()).toStdString() + " " + newBook.getImageURL().toStdString() + " " + newBook.getSmallImageURL().toStdString() + " " + QString::number(newBook.getBooksCount()).toStdString();
+        connectionSocket->Send("addBook " + bookString);
+        std::string response = connectionSocket->Receive();
+        if(response!="Book has been added succesfully!")
+        {
+            QString message= QString::fromStdString(response);
+            QErrorMessage *errorMessage = QErrorMessage::qtHandler();
+
+            errorMessage->showMessage(message);
+        }
     }
 
 }
@@ -651,9 +838,25 @@ void MainWindow::availableBooksNameLineEditReturnPressed()
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
-    delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(),availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+    std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete availableBooksModel;
+    connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+    availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
@@ -662,9 +865,25 @@ void MainWindow::availableBooksISBNLineEditReturnPressed()
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
-    delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+    std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete availableBooksModel;
+    connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+    availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
@@ -673,9 +892,25 @@ void MainWindow::availableBooksAuthorLineEditReturnPressed()
     availableBooksCurrentPage = 0;
     availableBooksLastPage=0;
     availableBooksCurrentPageLineEdit->setText("0");
-    delete availableBooksModel;
 
-    availableBooksModel = new TreeModel(dataBase.searchAvailableBooks(availableBooksNameLineEdit->text(), availableBooksAuthorLineEdit->text(), availableBooksISBNLineEdit->text(), availableBooksCurrentPage),false);
+    std::string title = addUnderline(availableBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(availableBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = availableBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete availableBooksModel;
+    connectionSocket->Send("searchAvailableBooks "+ title + " " + author + " " + isbn + " "+ QString::number(availableBooksCurrentPage).toStdString());
+    availableBooksModel = new TreeModel(stringToAvailableBooksVector(connectionSocket->Receive()),false);
     availableBooksList->setModel(availableBooksModel);
 }
 
@@ -684,9 +919,25 @@ void MainWindow::borrowedBooksNameLineEditReturnPressed()
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
-    delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete borrowedBooksModel;
+    connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+    borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }
 
@@ -695,10 +946,94 @@ void MainWindow::borrowedBooksAuthorLineEditReturnPressed()
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
-    delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete borrowedBooksModel;
+    connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+    borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
     borrowedBooksList->setModel(borrowedBooksModel);
+}
+
+std::vector<std::string> MainWindow::separate(const std::string &message, char separator)
+{
+    std::vector<std::string> result;
+
+    int lastPosition = 0;
+    int position = message.find(separator);
+
+    while(position !=std::string::npos)
+    {
+        result.push_back(message.substr(lastPosition,position - lastPosition));
+        lastPosition = position + 1;
+        position = message.find(separator,lastPosition);
+    }
+
+    result.push_back(message.substr(lastPosition,message.size() - lastPosition));
+
+    return result;
+}
+
+std::vector<Book> MainWindow::stringToAvailableBooksVector(std::string string)
+{
+    std::vector<std::string> lines = separate(string, '\n');
+    std::vector<Book> bookVector;
+    for(int index =1;index<lines.size();index++)
+    {
+        std::vector<std::string> words = separate(lines[index], ' ');
+        eliminateUnderline(words[2]);
+        eliminateUnderline(words[4]);
+        Book newBook(QString::fromStdString(words[0]).toInt(),QString::fromStdString(words[1]),QString::fromStdString(words[2]),QString::fromStdString(words[3]).toInt(),QString::fromStdString(words[4]),QString::fromStdString(words[5]),QString::fromStdString(words[6]).toFloat(),QString::fromStdString(words[7]),QString::fromStdString(words[8]),QString::fromStdString(words[9]).toInt());
+        bookVector.push_back(newBook);
+    }
+    return bookVector;
+}
+
+std::vector<Book> MainWindow::stringToBorrowedBooksVector(std::string string)
+{
+    std::vector<std::string> lines = separate(string, '\n');
+    std::vector<Book> bookVector;
+    for(int index =1;index<lines.size();index++)
+    {
+        std::vector<std::string> words = separate(lines[index], ' ');
+        eliminateUnderline(words[2]);
+        eliminateUnderline(words[4]);
+        Book newBook(QString::fromStdString(words[0]).toInt(),QString::fromStdString(words[1]),QString::fromStdString(words[2]),QString::fromStdString(words[3]).toInt(),QString::fromStdString(words[4]),QString::fromStdString(words[5]),QString::fromStdString(words[6]).toFloat(),QString::fromStdString(words[7]),QString::fromStdString(words[8]),QString::fromStdString(words[9]).toInt(),QString::fromStdString(words[10]).toInt());
+        bookVector.push_back(newBook);
+    }
+    return bookVector;
+}
+
+void MainWindow::eliminateUnderline(std::string &message)
+{
+    for(auto& character : message)
+    {
+        if(character == '_')
+            character = ' ';
+    }
+}
+
+std::string MainWindow::addUnderline(std::string message)
+{
+    for(auto& character : message)
+    {
+        if(character == ' ')
+            character = '_';
+    }
+    return message;
 }
 
 void MainWindow::borrowedBooksISBNLineEditReturnPressed()
@@ -706,8 +1041,24 @@ void MainWindow::borrowedBooksISBNLineEditReturnPressed()
     borrowedBooksCurrentPage = 0;
     borrowedBooksLastPage=0;
     borrowedBooksCurrentPageLineEdit->setText("0");
-    delete borrowedBooksModel;
 
-    borrowedBooksModel = new TreeModel(dataBase.searchBorrowedBooks(borrowedBooksNameLineEdit->text(), borrowedBooksAuthorLineEdit->text(), borrowedBooksISBNLineEdit->text(), borrowedBooksCurrentPage, currentUser.getUserName()), false);
+    std::string title = addUnderline(borrowedBooksNameLineEdit->text().toStdString());
+
+    if(title == "")
+        title ="`";
+
+    std::string author = addUnderline(borrowedBooksAuthorLineEdit->text().toStdString());
+
+    if(author == "")
+        author ="`";
+
+    std::string isbn = borrowedBooksISBNLineEdit->text().toStdString();
+
+    if(isbn == "")
+        isbn ="`";
+
+    delete borrowedBooksModel;
+    connectionSocket->Send("searchBorrowedBooks "+ title + " " + author + " " + isbn + " "+ QString::number(borrowedBooksCurrentPage).toStdString());
+    borrowedBooksModel = new TreeModel(stringToBorrowedBooksVector(connectionSocket->Receive()), true);
     borrowedBooksList->setModel(borrowedBooksModel);
 }

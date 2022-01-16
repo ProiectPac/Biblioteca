@@ -74,7 +74,7 @@ void SQLDataBase::removeUser(QString name)
 void SQLDataBase::addBook(Book book)
 {
     QSqlQuery query(dataBase);
-    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url) VALUES(?,?,?,?,?,?,?,?)");
+    query.prepare("INSERT INTO books(isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count) VALUES(?,?,?,?,?,?,?,?,?)");
     query.addBindValue(book.getISBN());
     query.addBindValue(book.getAuthor());
     query.addBindValue(book.getOriginalPublicationYear());
@@ -83,6 +83,7 @@ void SQLDataBase::addBook(Book book)
     query.addBindValue(book.getAverageRating());
     query.addBindValue(book.getImageURL());
     query.addBindValue(book.getSmallImageURL());
+    query.addBindValue(book.getBooksCount());
     if(!query.exec())
         qWarning() << "ERROR: " << query.lastError().text();
 }
@@ -498,7 +499,7 @@ int SQLDataBase::levenshteinDistance(std::string p_string1, std::string p_string
 
     std::vector<std::vector<int>> d;
     d.resize(l_string_length1+1);
-    for(auto line:d)
+    for(auto& line:d)
         line.resize(l_string_length2+1);
 
     int i;
