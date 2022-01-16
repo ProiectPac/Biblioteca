@@ -2,7 +2,7 @@
 
 void SQLDataBase::addUser(User user)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("INSERT INTO users VALUES(?,?)");
     query.addBindValue(user.getUserName());
     query.addBindValue(user.getPasswordHash());
@@ -15,7 +15,9 @@ SQLDataBase::SQLDataBase()
     const QString driver ="QSQLITE";
     if(QSqlDatabase::isDriverAvailable(driver))
     {
-        dataBase = QSqlDatabase::addDatabase(driver);
+        QString databaseId = QString::number(QRandomGenerator::global()->generate());
+        dataBase = QSqlDatabase::addDatabase("QSQLITE",databaseId);
+
         dataBase.setDatabaseName("../dataBase.db");
         if(!dataBase.open())
         {
@@ -26,7 +28,7 @@ SQLDataBase::SQLDataBase()
 
 User SQLDataBase::findUser(QString name, unsigned int passwordHash)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("SELECT name,passwordHash FROM users WHERE name=? AND passwordHash = ?");
     query.addBindValue(name);
     query.addBindValue(passwordHash);
@@ -45,7 +47,7 @@ User SQLDataBase::findUser(QString name, unsigned int passwordHash)
 
 User SQLDataBase::findUser(QString name)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("SELECT name FROM users WHERE name=?");
     query.addBindValue(name);
     if(!query.exec())
@@ -62,7 +64,7 @@ User SQLDataBase::findUser(QString name)
 }
 void SQLDataBase::removeUser(QString name)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("DELETE FROM users WHERE name = ?;");
     query.addBindValue(name);
     if(!query.exec())
@@ -87,7 +89,7 @@ void SQLDataBase::addBook(Book book)
 
 void SQLDataBase::removeBook(int bookId)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("DELETE FROM books WHERE id = ?;");
     query.addBindValue(bookId);
     if(!query.exec())
@@ -97,7 +99,7 @@ void SQLDataBase::removeBook(int bookId)
 std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
 {
     std::vector<Book>availableBooks;
-    QSqlQuery booksQuery;
+    QSqlQuery booksQuery(dataBase);
     booksQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count FROM books WHERE books_count>0 AND ROWID >= ? AND ROWID < ?");
     booksQuery.addBindValue(pageNumber*45);
     pageNumber++;
@@ -116,7 +118,7 @@ std::vector<Book> SQLDataBase::getAvailableBooks(int pageNumber)
 
 Book SQLDataBase::getBook(int id)
 {
-    QSqlQuery bookQuery;
+    QSqlQuery bookQuery(dataBase);
     bookQuery.prepare("SELECT id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,books_count FROM books WHERE id = ?");
     bookQuery.addBindValue(id);
     if(!bookQuery.exec())
@@ -134,7 +136,7 @@ Book SQLDataBase::getBook(int id)
 
 void SQLDataBase::updateUserPassword(QString userName, unsigned int newPasswordHash)
 {
-    QSqlQuery query;
+    QSqlQuery query(dataBase);
     query.prepare("UPDATE users SET passwordHash = ? WHERE name = ?");
     query.addBindValue(newPasswordHash);
     query.addBindValue(userName);
@@ -164,7 +166,7 @@ std::string SQLDataBase::borrowBook(QString userName, int bookID)
         }
     }
     int booksCount=0;
-    QSqlQuery booksCountQuery;
+    QSqlQuery booksCountQuery(dataBase);
     booksCountQuery.prepare("SELECT books_count FROM books WHERE id=?");
     booksCountQuery.addBindValue(bookID);
     if(!booksCountQuery.exec())
@@ -180,13 +182,13 @@ std::string SQLDataBase::borrowBook(QString userName, int bookID)
             return message.toStdString();
         }
     }
-    QSqlQuery insertQuery;
+    QSqlQuery insertQuery(dataBase);
     insertQuery.prepare("INSERT INTO user_book VALUES(?,?,14)");
     insertQuery.addBindValue(bookID);
     insertQuery.addBindValue(userName);
     if(!insertQuery.exec())
         qWarning() << "ERROR: " << insertQuery.lastError().text();
-    QSqlQuery updateQuery;
+    QSqlQuery updateQuery(dataBase);
     updateQuery.prepare("UPDATE books SET books_count=? WHERE id=?");
     updateQuery.addBindValue(booksCount-1);
     updateQuery.addBindValue(bookID);
@@ -198,7 +200,7 @@ std::string SQLDataBase::borrowBook(QString userName, int bookID)
 void SQLDataBase::returnBook(QString userName, int bookID)
 {
     int booksCount=0;
-    QSqlQuery booksCountQuery;
+    QSqlQuery booksCountQuery(dataBase);
     booksCountQuery.prepare("SELECT books_count FROM books WHERE id=?");
     booksCountQuery.addBindValue(bookID);
     if(!booksCountQuery.exec())
@@ -211,14 +213,14 @@ void SQLDataBase::returnBook(QString userName, int bookID)
         booksCount=booksCountQuery.value(0).toInt();
     }
 
-    QSqlQuery updateQuery;
+    QSqlQuery updateQuery(dataBase);
     updateQuery.prepare("UPDATE books SET books_count=? WHERE id=?");
     updateQuery.addBindValue(booksCount+1);
     updateQuery.addBindValue(bookID);
     if(!updateQuery.exec())
         qWarning() << "ERROR: " << updateQuery.lastError().text();
 
-    QSqlQuery deleteQuery;
+    QSqlQuery deleteQuery(dataBase);
     deleteQuery.prepare("DELETE FROM user_book WHERE book_id = ? AND user_name = ?");
     deleteQuery.addBindValue(bookID);
     deleteQuery.addBindValue(userName);
@@ -230,9 +232,9 @@ void SQLDataBase::returnBook(QString userName, int bookID)
 std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName)
 {
     std::vector<Book>previousBooks;
-    QSqlQuery booksQuery;
+    QSqlQuery booksQuery(dataBase);
     QSqlQuery createTable("CREATE TABLE borrowed_books (id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days, PRIMARY KEY(id));");
-    QSqlQuery insert;
+    QSqlQuery insert(dataBase);
 
     insert.prepare(" INSERT INTO borrowed_books(id,isbn,authors,original_publication_year,title,language_code,average_rating,image_url,small_image_url,remaining_days) SELECT books.id,books.isbn,books.authors,books.original_publication_year,books.title,books.language_code,books.average_rating,books.image_url,books.small_image_url,user_book.remaining_days FROM ((user_book INNER JOIN users ON users.name = user_book.user_name) INNER JOIN books ON books.id = user_book.book_id) WHERE users.name = ?;");
     booksQuery.prepare(" SELECT * FROM borrowed_books WHERE ROWID >= ? AND ROWID < ? ;");
@@ -253,14 +255,14 @@ std::vector<Book> SQLDataBase::getBorrowedBooks(int pageNumber, QString userName
                 previousBooks.push_back(Book(booksQuery.value(0).toInt(), booksQuery.value(1).toString(),booksQuery.value(2).toString(),booksQuery.value(3).toInt(), booksQuery.value(4).toString(),booksQuery.value(5).toString(),booksQuery.value(6).toFloat(),booksQuery.value(7).toString(),booksQuery.value(8).toString(),0,booksQuery.value(9).toInt()));
             }
         }
-        QSqlQuery drop("DROP TABLE borrowed_books");
+        QSqlQuery drop("DROP TABLE borrowed_books",dataBase);
     }
     return previousBooks;
 }
 
 Book SQLDataBase::getBorrowedBook(int id, QString userName)
 {
-    QSqlQuery bookQuery;
+    QSqlQuery bookQuery(dataBase);
     bookQuery.prepare("SELECT remaining_days FROM user_book WHERE book_id = ? AND user_name=?");
     bookQuery.addBindValue(id);
     bookQuery.addBindValue(userName);

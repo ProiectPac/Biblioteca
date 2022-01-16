@@ -13,9 +13,10 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     TCPSocket::startUp();
     TCPSocket connectionsSocket;    
-    connectionsSocket.Listen("192.168.0.111",27015);
+    connectionsSocket.Listen("localhost",27015);
+
     while(true)
-    {       
+    {
        std::thread clientThread(Controller::run,connectionsSocket.Accept(),connectionsSocket.getLocalKey());
        clientThread.detach();
     }

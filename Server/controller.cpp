@@ -537,7 +537,6 @@ void Controller::run(std::pair<SOCKET,std::string> clientData, EVP_PKEY* localKe
     Controller controller;
     controller.client = new TCPSocket(clientData.first);
 
-
     auto remoteKey = TCPSocket::createPublicKey(clientData.second);
     controller.client->setRemoteKey(remoteKey);
 

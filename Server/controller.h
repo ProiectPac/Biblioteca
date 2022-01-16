@@ -36,7 +36,7 @@ private:
     Commands interpret(std::string const& message);
     std::vector<std::string> parametrize(std::string const& message);
     TCPSocket *client=nullptr;
-    SQLDataBase dataBase;    
+    SQLDataBase dataBase;
 
     void login(std::vector<std::string> message);
     void registerAccount(std::vector<std::string> message);

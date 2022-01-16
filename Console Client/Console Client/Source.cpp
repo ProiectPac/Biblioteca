@@ -11,7 +11,7 @@ int main()
 {
 	TCPSocket::startUp();
 	TCPSocket socket;
-	socket.ConnectToServer("192.168.0.111", 27015);
+	socket.ConnectToServer("localhost", 27015);
 	int len = 1025;
 	char buffer[1025];
 
