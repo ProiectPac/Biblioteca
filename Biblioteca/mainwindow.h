@@ -77,7 +77,6 @@ private:
 
     User currentUser;
 
-
     void displayAvailableBook(const QModelIndex &index);
     void displayBorrowedBook(const QModelIndex &index);
     void setUser(User newUser);
