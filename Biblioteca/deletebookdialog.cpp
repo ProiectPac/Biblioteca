@@ -3,11 +3,7 @@
 void DeleteBookDialog::setupUI()
 {
     QFormLayout *inputsLayout = new QFormLayout(this);
-    //titleLineEdit = new QLineEdit(this);
-    //ISBNLineEdit = new QLineEdit(this);
     idLineEdit = new QLineEdit(this);
-    //inputsLayout->addRow("Title: ",titleLineEdit);
-    //inputsLayout->addRow("ISBN: ",ISBNLineEdit);
     inputsLayout->addRow("ID: ",idLineEdit);
 
     QGroupBox *inputsBox = new QGroupBox(this);

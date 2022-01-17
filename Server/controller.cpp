@@ -597,7 +597,7 @@ void Controller::receiveComand()
         break;
 
     case Controller::Commands::None:
-        client->Send("Unkown command");
+        client->Send("Unknown command");
         break;
     }
     message.clear();
